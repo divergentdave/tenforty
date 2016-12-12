@@ -1,15 +1,7 @@
 (ns tenforty.core
   (:use clojure.walk))
 
-(comment
-
-  (defn defline
-    [name expression]
-    nil)
-
-  (defmacro defform
-    [name year & lines]
-    (map #(apply defline %) lines))) (defrecord data-dependency [kw])
+(defrecord data-dependency [kw])
 
 (defn data-dependencies [l]
   (let [transformed
@@ -45,3 +37,9 @@
                       form))
          filtered)]
     result))
+
+(defrecord line [kw fn deps])
+
+(defmacro makeline
+  [kw expression]
+  (list 'tenforty.core/->line kw (list 'fn ['cell-value] expression) (cons 'list (data-dependencies expression))))
