@@ -36,7 +36,7 @@
                         retval)
                       form))
          filtered)]
-    result))
+    (set result)))
 
 (defprotocol LineMethods
   (get-keyword [self])
@@ -49,7 +49,7 @@
   (get-keyword [self] (:kw self))
   (get-name [self] (name (:kw self)))
   (eval-line [self cell-value] (cell-value (:kw self)))
-  (get-deps [self] (list)))
+  (get-deps [self] #{}))
 
 (defrecord FormulaLine [kw fn deps]
   LineMethods
@@ -60,4 +60,4 @@
 
 (defmacro makeline
   [kw expression]
-  (list 'tenforty.core/->FormulaLine kw (list 'fn ['cell-value] expression) (cons 'list (data-dependencies expression))))
+  (list 'tenforty.core/->FormulaLine kw (list 'fn ['cell-value] expression) (data-dependencies expression)))
