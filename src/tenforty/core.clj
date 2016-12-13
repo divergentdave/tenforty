@@ -13,7 +13,7 @@
                     %)
                   %)]
             retval)
-         (seq [l]))
+         (list l))
         filtered
         (postwalk
          #(let [retval
@@ -21,7 +21,7 @@
                   %
                   (if (instance? data-dependency %)
                     (:kw %)
-                    ()))]
+                    (list)))]
             retval)
          transformed)
         result
@@ -30,7 +30,7 @@
                       (let [listified
                             (map (fn [x] (if (seq? x)
                                            x
-                                           (seq [x]))) form)
+                                           (list x))) form)
                             retval
                             (apply concat listified)]
                         retval)
@@ -49,7 +49,7 @@
   (get-keyword [self] (:kw self))
   (get-name [self] (name (:kw self)))
   (eval-line [self cell-value] (cell-value (:kw self)))
-  (get-deps [self] ()))
+  (get-deps [self] (list)))
 
 (defrecord FormulaLine [kw fn deps]
   LineMethods
