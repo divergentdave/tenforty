@@ -61,3 +61,9 @@
 (defmacro makeline
   [kw expression]
   (list 'tenforty.core/->FormulaLine kw (list 'fn ['cell-value] expression) (data-dependencies expression)))
+
+(defmacro defform
+  [& lines]
+  (let [sym (gensym)]
+    `(let [~sym (list ~@lines)]
+       (def ~'form (zipmap (map :kw ~sym) ~sym)))))

@@ -29,3 +29,11 @@
       (is (== ((:fn tax_minus_credits) (fn [kw] 0)) 0))
       (is (== ((:fn tax_minus_credits) (fn [kw] 1)) 0))
       (is (== ((:fn tax_minus_credits) (fn [kw] -1)) 1)))))
+
+(deftest defform-test
+  (defform)
+  (is (= form {}))
+  (defform
+    (makeline ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0)))
+  (is (= (:kw (::refund form)) ::refund))
+  (is (= (:deps (::refund form)) #{::total_payments ::total_tax})))
