@@ -38,8 +38,26 @@
          filtered)]
     result))
 
-(defrecord line [kw fn deps])
+(defprotocol LineMethods
+  (get-keyword [self])
+  (get-name [self])
+  (eval-line [self cell-value])
+  (get-deps [self]))
+
+(defrecord InputLine [kw]
+  LineMethods
+  (get-keyword [self] (:kw self))
+  (get-name [self] (name (:kw self)))
+  (eval-line [self cell-value] (cell-value (:kw self)))
+  (get-deps [self] ()))
+
+(defrecord FormulaLine [kw fn deps]
+  LineMethods
+  (get-keyword [self] (:kw self))
+  (get-name [self] (name (:kw self)))
+  (eval-line [self cell-value] ((:fn self) cell-value))
+  (get-deps [self] (:deps self)))
 
 (defmacro makeline
   [kw expression]
-  (list 'tenforty.core/->line kw (list 'fn ['cell-value] expression) (cons 'list (data-dependencies expression))))
+  (list 'tenforty.core/->FormulaLine kw (list 'fn ['cell-value] expression) (cons 'list (data-dependencies expression))))
