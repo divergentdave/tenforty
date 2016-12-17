@@ -1,0 +1,32 @@
+Copyright (C) 2016 David Cook
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, version 2, as modified below.
+
+This program is distributed in the hope that it will be usefuk,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+Additional permission:
+
+If you modify this Program, or any covered work, by linking or
+combining it with clojure (or a modified version of that
+library), containing parts covered by the terms of the Eclipse
+Public License, the licensors of this Program grant you
+additional permission to convey the resulting work. {Corresponding
+Source for a non-source form of such a combination shall include the
+source code for the parts of clojure used as well as that
+of the covered work.}
+
+Clarification:
+
+An application hosted on a server and remotely operated by users, such
+as a web application or database server, is understood to be distribution
+of the software, and therefore all GPL v2 clauses regarding distribution
+apply. For example, a web application must include a link for downloading
+the application source code.
