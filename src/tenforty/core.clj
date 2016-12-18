@@ -51,6 +51,20 @@
   (eval-line [self cell-value] (cell-value (:kw self)))
   (get-deps [self] #{}))
 
+(defrecord CodeInputLine [kw]
+  LineMethods
+  (get-keyword [self] (:kw self))
+  (get-name [self] (name (:kw self)))
+  (eval-line [self cell-value] (cell-value (:kw self)))
+  (get-deps [self] #{}))
+
+(defrecord BooleanInputLine [kw]
+  LineMethods
+  (get-keyword [self] (:kw self))
+  (get-name [self] (name (:kw self)))
+  (eval-line [self cell-value] (cell-value (:kw self)))
+  (get-deps [self] #{}))
+
 (defrecord FormulaLine [kw fn deps]
   LineMethods
   (get-keyword [self] (:kw self))
