@@ -11,9 +11,6 @@
 (def ^:const QUALIFYING_WIDOW_WIDOWER 5)
 
 (defform
-  (->InputLine ::pretotal_tax) ; TODO
-  (->InputLine ::total_credits) ; TODO
-
   (->CodeInputLine ::filing_status) ; IRS1040/IndividualReturnFilingStatusCd/text()
   (->BooleanInputLine ::exemption_self)
   (->BooleanInputLine ::exemption_spouse)
@@ -223,5 +220,110 @@
                                         (if (= (cell-value ::filing_status) MARRIED_FILING_SEPARATELY)
                                           1250
                                           2500)))))))
+  (makeline ::taxable_income (max 0 (- (cell-value ::agi_minus_deductions) (cell-value ::exemptions))))
+  (makeline ::tax (case (cell-value ::filing_status)
+                    SINGLE
+                    (condp > (cell-value ::taxable_income)
+                      9225 (* 0.1 (cell-value ::taxable_income))
+                      37450 (+ 922.50 (* 0.15 (- (cell-value ::taxable_income) 9225)))
+                      90750 (+ 5156.25 (* 0.25 (- (cell-value ::taxable_income) 37450)))
+                      189300 (+ 18481.25 (* 0.28 (- (cell-value ::taxable_income) 90750)))
+                      411500 (+ 46075.25 (* 0.33 (- (cell-value ::taxable_income) 189300)))
+                      413200 (+ 119401.25 (* 0.35 (- (cell-value ::taxable_income) 411500)))
+                      (+ 119996.25 (* 0.396 (- (cell-value ::taxable_income) 413200))))
+                    MARRIED_FILING_JOINTLY
+                    (condp > (cell-value ::taxable_income)
+                      18450 (* 0.1 (cell-value ::taxable_income))
+                      74900 (+ 1845 (* 0.15 (- (cell-value ::taxable_income) 18450)))
+                      151200 (+ 10312.50 (* 0.25 (- (cell-value ::taxable_income) 74900)))
+                      230450 (+ 29387.50 (* 0.28 (- (cell-value ::taxable_income) 151200)))
+                      411500 (+ 51577.50 (* 0.33 (- (cell-value ::taxable_income) 230450)))
+                      464850 (+ 111324 (* 0.35 (- (cell-value ::taxable_income) 411500)))
+                      (+ 129996.50 (* 0.396 (- (cell-value ::taxable_income) 464850))))
+                    QUALIFYING_WIDOW_WIDOWER
+                    (condp > (cell-value ::taxable_income)
+                      18450 (* 0.1 (cell-value ::taxable_income))
+                      74900 (+ 1845 (* 0.15 (- (cell-value ::taxable_income) 18450)))
+                      151200 (+ 10312.50 (* 0.25 (- (cell-value ::taxable_income) 74900)))
+                      230450 (+ 29387.50 (* 0.28 (- (cell-value ::taxable_income) 151200)))
+                      411500 (+ 51577.50 (* 0.33 (- (cell-value ::taxable_income) 230450)))
+                      464850 (+ 111324 (* 0.35 (- (cell-value ::taxable_income) 411500)))
+                      (+ 129996.50 (* 0.396 (- (cell-value ::taxable_income) 464850))))
+                    MARRIED_FILING_SEPARATELY
+                    (condp > (cell-value ::taxable_income)
+                      9225 (* 0.1 (cell-value ::taxable_income))
+                      37450 (+ 922.50 (* 0.15 (- (cell-value ::taxable_income) 9225)))
+                      75600 (+ 5156.25 (* 0.25 (- (cell-value ::taxable_income) 37450)))
+                      115225 (+ 14693.75 (* 0.28 (- (cell-value ::taxable_income) 75600)))
+                      205750 (+ 25788.75 (* 0.33 (- (cell-value ::taxable_income) 115225)))
+                      232425 (+ 55662 (* 0.35 (- (cell-value ::taxable_income) 205750)))
+                      (+ 64998.25 (* 0.396 (- (cell-value ::taxable_income) 232425))))
+                    HEAD_OF_HOUSEHOLD
+                    (condp > (cell-value ::taxable_income)
+                      13150 (* 0.1 (cell-value ::taxable_income))
+                      50200 (+ 1315 (* 0.15 (- (cell-value ::taxable_income) 13150)))
+                      129600 (+ 6872.50 (* 0.25 (- (cell-value ::taxable_income) 50200)))
+                      209850 (+ 26722.50 (* 0.28 (- (cell-value ::taxable_income) 129600)))
+                      411500 (+ 49192.50 (* 0.33 (- (cell-value ::taxable_income) 209850)))
+                      439000 (+ 115737 (* 0.35 (- (cell-value ::taxable_income) 411500)))
+                      (+ 125362 (* 0.396 (- (cell-value ::taxable_income) 439000))))))
+  ; TODO: Form 8814, Form 4972, section 962 election, Form 8863, Form 8621 taxes
+  (->InputLine ::alternative_minimum_tax) ; TODO
+  (->InputLine ::premium_credit_repayment) ; TODO
+  (makeline ::pretotal_tax (+ (cell-value ::tax)
+                              (cell-value ::alternative_minimum_tax)
+                              (cell-value ::premium_credit_repayment)))
+  (->InputLine ::foreign_tax_credit) ; TODO
+  (->InputLine ::child_dependent_care_credit) ; TODO
+  (->InputLine ::education_credits) ; TODO
+  (->InputLine ::retirement_savings_contributions_credit) ; TODO
+  (->InputLine ::child_tax_credit) ; TODO
+  (->InputLine ::residential_energy_credits) ; TODO
+  (->InputLine ::other_credits) ; TODO
+  (makeline ::total_credits (+ (cell-value ::foreign_tax_credit)
+                               (cell-value ::child_dependent_care_credit)
+                               (cell-value ::education_credits)
+                               (cell-value ::retirement_savings_contributions_credit)
+                               (cell-value ::child_tax_credit)
+                               (cell-value ::residential_energy_credits)
+                               (cell-value ::other_credits)))
+  (makeline ::tax_minus_credits (max (- (cell-value ::pretotal_tax) (cell-value ::total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0))
 
-  (makeline ::tax_minus_credits (max (- (cell-value ::pretotal_tax) (cell-value ::total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0)))
+  (->InputLine ::self_employment_tax) ; TODO
+  (->InputLine ::unreported_social_security_medicare_tax) ; TODO
+  (->InputLine ::additional_tax_retirement_plans) ; TODO
+  (->InputLine ::household_employment_taxes) ; TODO
+  (->InputLine ::first_time_homebuyer_credit_repayment) ; TODO
+  (->InputLine ::health_care_individual_responsibility) ; TODO
+  (->InputLine ::other_taxes) ; TODO
+  (makeline ::total_tax (+ (cell-value ::tax_minus_credits)
+                           (cell-value ::self_employment_tax)
+                           (cell-value ::unreported_social_security_medicare_tax)
+                           (cell-value ::additional_tax_retirement_plans)
+                           (cell-value ::household_employment_taxes)
+                           (cell-value ::first_time_homebuyer_credit_repayment)
+                           (cell-value ::health_care_individual_responsibility)
+                           (cell-value ::other_taxes)))
+
+  (->InputLine ::federal_tax_withheld)
+  (->InputLine ::estimated_tax_payments)
+  (->InputLine ::earned_income_credit)
+  (->InputLine ::additional_child_tax_credit)
+  (->InputLine ::american_opportunity_credit)
+  (->InputLine ::net_premium_tax_credit)
+  (->InputLine ::payment_with_extension_request)
+  (->InputLine ::excess_social_security_withheld)
+  (->InputLine ::federal_fuel_tax_credit)
+  (->InputLine ::other_credits_payments)
+  (makeline ::total_payments (+ (cell-value ::federal_tax_withheld)
+                                (cell-value ::estimated_tax_payments)
+                                (cell-value ::earned_income_credit)
+                                (cell-value ::additional_child_tax_credit)
+                                (cell-value ::american_opportunity_credit)
+                                (cell-value ::net_premium_tax_credit)
+                                (cell-value ::payment_with_extension_request)
+                                (cell-value ::excess_social_security_withheld)
+                                (cell-value ::federal_fuel_tax_credit)
+                                (cell-value ::other_credits_payments)))
+  (makeline ::refund (max 0 (- (cell-value ::total_payments) (cell-value ::total_tax))))
+  (makeline ::tax_owed (max 0 (- (cell-value ::total_tax) (cell-value ::total_payments)))))
