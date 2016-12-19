@@ -1,4 +1,5 @@
 (ns tenforty.forms.ty2015.f1040
+  (:require [clojure.math.numeric-tower :refer [ceil]])
   (:use tenforty.core)
   (:require tenforty.forms.ty2015.s8812))
 
@@ -17,9 +18,9 @@
   (->BooleanInputLine ::exemption_self)
   (->BooleanInputLine ::exemption_spouse)
   (->InputLine ::dependents)
-  (makeline ::exemptions (+ (if (cell-value ::exemption_self) 1 0)
-                            (if (cell-value ::exemption_spouse) 1 0)
-                            (cell-value ::dependents)))
+  (makeline ::exemptions_number (+ (if (cell-value ::exemption_self) 1 0)
+                                   (if (cell-value ::exemption_spouse) 1 0)
+                                   (cell-value ::dependents)))
 
   (->InputLine ::wages) ; TODO
   (->InputLine ::taxable_interest) ; TODO
@@ -196,5 +197,31 @@
                                      HEAD_OF_HOUSEHOLD 9250)))
   (->InputLine ::itemized_deductions) ; TODO, schedule A
   (makeline ::deductions (max (cell-value ::standard_deduction) (cell-value ::itemized_deductions))) ; TODO: "In most cases, your federal income tax will be less if you take the larger of your itemized  deductions  or  standard  deduction." Should this be surfaced as a choice in case the lesser deduction makes more sense?
+  (makeline ::agi_minus_deductions (- (cell-value ::agi) (cell-value ::deductions)))
+  (makeline ::exemptions_ceiling (case (cell-value ::filing_status)
+                                   SINGLE 258250
+                                   MARRIED_FILING_JOINTLY 309900
+                                   QUALIFYING_WIDOW_WIDOWER 309900
+                                   MARRIED_FILING_SEPARATELY 154950
+                                   HEAD_OF_HOUSEHOLD 284050))
+  (makeline ::exemptions (cond
+                           ; Deduction for exemptions worksheet, line 1
+                           (<= (cell-value ::agi) (cell-value ::exemptions_ceiling))
+                           (* 4000 (cell-value ::exemptions_number))
+                           ; Deduction for exemptions worksheet, line 5
+                           (> (- (cell-value ::agi) (cell-value ::exemptions_ceiling))
+                              (if (= (cell-value ::filing_status) MARRIED_FILING_SEPARATELY)
+                                61250
+                                122500))
+                           0
+                           ; Deduction for exemptions worksheet, line 9
+                           true
+                           (-
+                            (* 4000 (cell-value ::exemptions_number))
+                            (* 4000 (cell-value ::exemptions_number) 0.02
+                               (ceil (/ (- (cell-value ::agi) (cell-value ::exemptions_ceiling))
+                                        (if (= (cell-value ::filing_status) MARRIED_FILING_SEPARATELY)
+                                          1250
+                                          2500)))))))
 
   (makeline ::tax_minus_credits (max (- (cell-value ::pretotal_tax) (cell-value ::total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0)))
