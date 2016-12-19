@@ -78,6 +78,11 @@
 
 (defmacro defform
   [& lines]
-  (let [sym (gensym)]
+  (let [sym (gensym)
+        coll (gensym "coll")
+        obj (gensym "obj")]
     `(let [~sym (list ~@lines)]
+       (reduce (fn [~coll ~obj] (if (contains? ~coll (:kw ~obj))
+                                (throw (IllegalArgumentException. (str "Duplicate keyword " (:kw ~obj) " was used")))
+                                (conj ~coll (:kw ~obj)))) #{} ~sym)
        (def ~'form (zipmap (map :kw ~sym) ~sym)))))

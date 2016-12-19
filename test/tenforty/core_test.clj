@@ -37,3 +37,9 @@
     (makeline ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0)))
   (is (= (:kw (::refund form)) ::refund))
   (is (= (:deps (::refund form)) #{::total_payments ::total_tax})))
+
+(deftest duplicate-line-test
+  (is (thrown? IllegalArgumentException
+               (defform
+                 (->InputLine ::a)
+                 (->InputLine ::a)))))
