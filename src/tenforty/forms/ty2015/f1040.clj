@@ -139,9 +139,11 @@
                                (cell-value ::business_income_loss)
                                (cell-value ::farm_income_loss)
                                (- (cell-value ::self_employment_tax_deductible))))
-  (makeline ::standard_deduction (if (if (= (cell-value ::filing_status) MARRIED_FILING_JOINTLY)
-                                       (not (and (cell-value ::exemption_self) (cell-value ::exemption_spouse)))
-                                       (not (cell-value ::exemption_self)))
+  (makeline ::standard_deduction (cond
+                                   ; Exception 1 - dependent
+                                   (if (= (cell-value ::filing_status) MARRIED_FILING_JOINTLY)
+                                     (not (and (cell-value ::exemption_self) (cell-value ::exemption_spouse)))
+                                     (not (cell-value ::exemption_self)))
                                    (+ ; Standard Deduction Worksheet for Dependents
                                     (min (+ 350 (max 700 (cell-value ::earned_income)))
                                          (case (cell-value ::filing_status)
@@ -157,37 +159,41 @@
                                          MARRIED_FILING_SEPARATELY 1250
                                          SINGLE 1550
                                          HEAD_OF_HOUSEHOLD 1550)))
-                                   (if (> (cell-value ::senior_blind_total) 0)
-                                     (case (cell-value ::filing_status)
-                                       SINGLE (case (cell-value ::senior_blind_total)
-                                                1 7850
-                                                2 9400)
-                                       MARRIED_FILING_JOINTLY (case (cell-value ::senior_blind_total)
+                                   ; Exception 2 - box on line 39a checked
+                                   (> (cell-value ::senior_blind_total) 0)
+                                   (case (cell-value ::filing_status)
+                                     SINGLE (case (cell-value ::senior_blind_total)
+                                              1 7850
+                                              2 9400)
+                                     MARRIED_FILING_JOINTLY (case (cell-value ::senior_blind_total)
+                                                              1 13850
+                                                              2 15100
+                                                              3 16350
+                                                              4 17600)
+                                     QUALIFYING_WIDOW_WIDOWER (case (cell-value ::senior_blind_total)
                                                                 1 13850
                                                                 2 15100
                                                                 3 16350
                                                                 4 17600)
-                                       QUALIFYING_WIDOW_WIDOWER (case (cell-value ::senior_blind_total)
-                                                                  1 13850
-                                                                  2 15100
-                                                                  3 16350
-                                                                  4 17600)
-                                       MARRIED_FILING_SEPARATELY (case (cell-value ::senior_blind_total)
-                                                                   1 7550
-                                                                   2 8800
-                                                                   3 10050
-                                                                   4 11300)
-                                       HEAD_OF_HOUSEHOLD (case (cell-value ::senior_blind_total)
-                                                           1 10800
-                                                           2 12350))
-                                     (if (or (cell-value ::spouse_itemizes_separately) (cell-value ::dual_status_alien))
-                                       0
-                                       (case (cell-value ::filing_status)
-                                         SINGLE 6300
-                                         MARRIED_FILING_SEPAREATELY 6300
-                                         MARRIED_FILING_JOINTLY 12600
-                                         QUALIFYING_WIDOW_WIDOWER 12600
-                                         HEAD_OF_HOUSEHOLD 9250)))))
+                                     MARRIED_FILING_SEPARATELY (case (cell-value ::senior_blind_total)
+                                                                 1 7550
+                                                                 2 8800
+                                                                 3 10050
+                                                                 4 11300)
+                                     HEAD_OF_HOUSEHOLD (case (cell-value ::senior_blind_total)
+                                                         1 10800
+                                                         2 12350))
+                                   ; Exception 3 - box on line 39b checked
+                                   (or (cell-value ::spouse_itemizes_separately) (cell-value ::dual_status_alien))
+                                   0
+                                   ; All others
+                                   true
+                                   (case (cell-value ::filing_status)
+                                     SINGLE 6300
+                                     MARRIED_FILING_SEPAREATELY 6300
+                                     MARRIED_FILING_JOINTLY 12600
+                                     QUALIFYING_WIDOW_WIDOWER 12600
+                                     HEAD_OF_HOUSEHOLD 9250)))
   (->InputLine ::itemized_deductions) ; TODO, schedule A
   (makeline ::deductions (max (cell-value ::standard_deduction) (cell-value ::itemized_deductions))) ; TODO: "In most cases, your federal income tax will be less if you take the larger of your itemized  deductions  or  standard  deduction." Should this be surfaced as a choice in case the lesser deduction makes more sense?
 
