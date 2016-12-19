@@ -83,6 +83,6 @@
         obj (gensym "obj")]
     `(let [~sym (list ~@lines)]
        (reduce (fn [~coll ~obj] (if (contains? ~coll (:kw ~obj))
-                                (throw (IllegalArgumentException. (str "Duplicate keyword " (:kw ~obj) " was used")))
-                                (conj ~coll (:kw ~obj)))) #{} ~sym)
+                                  (throw (IllegalArgumentException. (str "More than one line uses the keyword " (:kw ~obj))))
+                                  (conj ~coll (:kw ~obj)))) #{} ~sym)
        (def ~'form (zipmap (map :kw ~sym) ~sym)))))
