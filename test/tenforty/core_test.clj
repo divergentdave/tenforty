@@ -8,7 +8,8 @@
     (is (= (data-dependencies '(+ 1 1)) #{}))
     (is (= (data-dependencies '(identity 0)) #{}))
     (is (= (data-dependencies '(+ (cell-value :AGI) 1)) #{:AGI}))
-    (is (= (data-dependencies '(- (cell-value :pretotal_tax) (cell-value :total_credits))) #{:pretotal_tax :total_credits}))))
+    (is (= (data-dependencies '(- (cell-value :pretotal_tax) (cell-value :total_credits))) #{:pretotal_tax :total_credits}))
+    (is (= (data-dependencies '(let [temp (cell-value :AGI)] temp)) #{:AGI}))))
 
 (deftest makeline-no-deps
   (testing "Macro to create a line with a degenerate expression"

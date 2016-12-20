@@ -7,10 +7,14 @@
   (let [transformed
         (postwalk
          #(let [retval
-                (if (seq? %)
+                (cond
+                  (seq? %)
                   (if (= (first %) 'cell-value)
                     (data-dependency. (second %))
                     %)
+                  (vector? %)
+                  (seq %)
+                  true
                   %)]
             retval)
          (list l))
