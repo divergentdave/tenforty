@@ -67,20 +67,6 @@
   (->InputLine ::social_security_benefits_taxable) ; TODO
   (->InputLine ::other_income) ; TODO
 
-  (makeline ::total_income (+ (cell-value ::wages)
-                              (cell-value ::taxable_interest)
-                              (cell-value ::ordinary_dividends)
-                              (cell-value ::taxable_tax_refunds)
-                              (cell-value ::alimony_received)
-                              (cell-value ::business_income_loss)
-                              (cell-value ::capital_gain_loss)
-                              (cell-value ::ira_distributions_taxable)
-                              (cell-value ::pensions_annuities_taxable)
-                              (cell-value ::schedule_e_income)
-                              (cell-value ::farm_income_loss)
-                              (cell-value ::unemployment_compensation)
-                              (cell-value ::social_security_benefits_taxable)
-                              (cell-value ::other_income)))
   (makeline ::magi_total_income (+ (cell-value ::wages)
                                    (cell-value ::taxable_interest)
                                    (cell-value ::ordinary_dividends)
@@ -94,6 +80,8 @@
                                    (cell-value ::unemployment_compensation)
                                    (cell-value ::social_security_benefits_taxable)
                                    (cell-value ::other_income)))
+  (makeline ::total_income (+ (cell-value ::magi_total_income)
+                              (cell-value ::schedule_e_income)))
 
   (->InputLine ::educator_expenses) ; TODO
   (->InputLine ::expenses_2106) ; TODO
