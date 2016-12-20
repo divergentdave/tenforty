@@ -93,7 +93,24 @@
   (->InputLine ::early_withdrawl_penalty) ; TODO
   (->InputLine ::alimony_paid) ; TODO
   (->InputLine ::ira_deduction) ; TODO
-  (->InputLine ::student_loan_interest_deduction) ; TODO
+
+  (->InputLine ::student_loan_interest)
+  (makeline ::student_loan_interest_deduction
+            (let [loans_maxed (min (cell-value ::student_loan_interest) 2500)
+                  income_limit (if (= (cell-value ::filing_status)
+                                      MARRIED_FILING_JOINTLY)
+                                 130000
+                                 65000)
+                  diff (max (- (cell-value ::total_income) income_limit) 0)
+                  diff_divided (/ diff (if (= (cell-value ::filing_status)
+                                              MARRIED_FILING_JOINTLY)
+                                         30000
+                                         15000))
+                  phased_out_loans (* loans_maxed diff_divided)]
+              (max
+               (- loans_maxed phased_out_loans)
+               0)))
+
   (->InputLine ::tuition_fees_deduction) ; TODO
   (->InputLine ::domestic_production_activities_deduction) ; TODO
   (makeline ::agi_deductions (+ (cell-value ::educator_expenses)
