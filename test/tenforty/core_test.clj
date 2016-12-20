@@ -43,3 +43,10 @@
                (defform
                  (->InputLine ::a)
                  (->InputLine ::a)))))
+
+(deftest zero-tax-situation-test
+  (is (= 0 (lookup (->ZeroTaxSituation) ::a))))
+
+(deftest map-tax-situation-test
+  (let [situation (->MapTaxSituation {::a 10})]
+    (is (= 10 (lookup situation ::a)))))

@@ -72,6 +72,17 @@
   (eval-line [self cell-value] ((:fn self) cell-value))
   (get-deps [self] (:deps self)))
 
+(defprotocol TaxSituation
+  (lookup [self kw]))
+
+(defrecord ZeroTaxSituation []
+  TaxSituation
+  (lookup [self kw] 0))
+
+(defrecord MapTaxSituation [data]
+  TaxSituation
+  (lookup [self kw] (kw (:data self))))
+
 (defmacro makeline
   [kw expression]
   (list 'tenforty.core/->FormulaLine kw (list 'fn ['cell-value] expression) (data-dependencies expression)))
