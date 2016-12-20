@@ -1,8 +1,7 @@
 (ns tenforty.line-deps-test
   (:require [clojure.test :refer :all]
             [tenforty.core :refer :all]
-            [tenforty.forms.ty2015.f1040]
-            [tenforty.forms.ty2015.s8812]))
+            [tenforty.forms.ty2015]))
 
 (defn check-deps
   [universe line]
@@ -10,8 +9,7 @@
         contains (partial contains? universe)]
     (dorun (map #(is (contains %) (str %)) deps))))
 
-(let [forms {:f1040 tenforty.forms.ty2015.f1040/form
-             :s8812 tenforty.forms.ty2015.s8812/form}
+(let [forms tenforty.forms.ty2015/forms
       universe (apply merge (vals forms))]
   (deftest line-deps
     (dorun (map #(testing (str "Check that lines are defined for all dependencies in " (key %))
