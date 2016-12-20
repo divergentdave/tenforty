@@ -51,3 +51,10 @@
 (deftest map-tax-situation-test
   (let [situation (->MapTaxSituation {::a 10})]
     (is (= 10 (lookup situation ::a)))))
+
+(deftest composite-tax-situation-test
+  (let [situation (->CompositeTaxSituation [(->MapTaxSituation {::a 10})
+                                            (->MapTaxSituation {::a 20
+                                                                ::b 30})])]
+    (is (= 10 (lookup situation ::a)))
+    (is (= 30 (lookup situation ::b)))))

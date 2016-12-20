@@ -87,6 +87,10 @@
   TaxSituation
   (lookup [self kw] (kw (:data self))))
 
+(defrecord CompositeTaxSituation [situations]
+  TaxSituation
+  (lookup [self kw] (first (keep #(lookup % kw) (:situations self)))))
+
 (defmacro makeline
   [kw expression]
   (list 'tenforty.core/->FormulaLine kw (list 'fn ['cell-value] expression) (data-dependencies expression)))
