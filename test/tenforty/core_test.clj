@@ -81,4 +81,8 @@
     (is (= 10 (calculate form :d situation)))
     (is (thrown? Throwable (calculate form :e situation)))
     (is (= true (calculate form :true situation)))
-    (is (= false (calculate form :false situation)))))
+    (is (= false (calculate form :false situation)))
+    (let [ctx (make-context form situation)]
+      (calculate ctx :a)
+      (is (= 5 (:a @(:cache ctx))))
+      (is (= 5 (calculate ctx :a))))))

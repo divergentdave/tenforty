@@ -110,7 +110,7 @@
 
 (defn make-context
   [lines situation]
-  (->TenfortyContext lines situation nil))
+  (->TenfortyContext lines situation (atom {})))
 
 (defn calculate
   ([lines kw situation]
@@ -119,7 +119,11 @@
    (let [line (kw (:lines context))]
      (cond
        (instance? FormulaLine line)
-       (eval-line line #(calculate (:lines context) % (:situation context)))
+       (if-let [entry (find @(:cache context) kw)]
+         (val entry)
+         (let [retval (eval-line line #(calculate context %))]
+           (swap! (:cache context) assoc kw retval)
+           retval))
        (or (instance? InputLine line)
            (instance? CodeInputLine line)
            (instance? BooleanInputLine line))
