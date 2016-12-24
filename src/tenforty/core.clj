@@ -106,15 +106,24 @@
   TaxSituation
   (lookup [self kw] (first (keep #(lookup % kw) (:situations self)))))
 
+(defrecord TenfortyContext [lines situation cache])
+
+(defn make-context
+  [lines situation]
+  (->TenfortyContext lines situation nil))
+
 (defn calculate
-  [lines kw situation]
-  (let [line (kw lines)]
-    (condp instance? line
-      FormulaLine
-      (eval-line line #(calculate lines % situation))
-      InputLine
-      (lookup situation kw)
-      CodeInputLine
-      (lookup situation kw)
-      BooleanInputLine
-      (lookup situation kw))))
+  ([lines kw situation]
+   (calculate (make-context lines situation) kw))
+  ([context kw]
+   (let [line (kw (:lines context))]
+     (cond
+       (instance? FormulaLine line)
+       (eval-line line #(calculate (:lines context) % (:situation context)))
+       (or (instance? InputLine line)
+           (instance? CodeInputLine line)
+           (instance? BooleanInputLine line))
+       (let [value (lookup (:situation context) kw)]
+         (if (nil? value)
+           (throw (Exception. (str "Tax situation has no value for " kw)))
+           value))))))

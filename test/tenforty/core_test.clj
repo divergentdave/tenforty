@@ -65,11 +65,20 @@
                                 (cell-value :d)))
               :b (->BooleanInputLine :b)
               :c (->InputLine :c)
-              :d (->InputLine :d)}
+              :d (->InputLine :d)
+              :e (makeline :e (cell-value :z))
+              :z (->InputLine :z)
+              :true (->BooleanInputLine :true)
+              :false (->BooleanInputLine :false)}
         situation (->MapTaxSituation {:b true
                                       :c 5
-                                      :d 10})]
+                                      :d 10
+                                      :true true
+                                      :false false})]
     (is (= 5 (calculate form :a situation)))
     (is (= true (calculate form :b situation)))
     (is (= 5 (calculate form :c situation)))
-    (is (= 10 (calculate form :d situation)))))
+    (is (= 10 (calculate form :d situation)))
+    (is (thrown? Throwable (calculate form :e situation)))
+    (is (= true (calculate form :true situation)))
+    (is (= false (calculate form :false situation)))))
