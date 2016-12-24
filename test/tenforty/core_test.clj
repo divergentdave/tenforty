@@ -58,3 +58,18 @@
                                                                 ::b 30})])]
     (is (= 10 (lookup situation ::a)))
     (is (= 30 (lookup situation ::b)))))
+
+(deftest calculate-test
+  (let [form {:a (makeline :a (if (cell-value :b)
+                                (cell-value :c)
+                                (cell-value :d)))
+              :b (->BooleanInputLine :b)
+              :c (->InputLine :c)
+              :d (->InputLine :d)}
+        situation (->MapTaxSituation {:b true
+                                      :c 5
+                                      :d 10})]
+    (is (= 5 (calculate form :a situation)))
+    (is (= true (calculate form :b situation)))
+    (is (= 5 (calculate form :c situation)))
+    (is (= 10 (calculate form :d situation)))))
