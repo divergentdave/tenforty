@@ -12,28 +12,28 @@
 
 (defform
   nil
-  [(->CodeInputLine ::filing_status) ; IRS1040/IndividualReturnFilingStatusCd/text()
-   (->BooleanInputLine ::exemption_self)
-   (->BooleanInputLine ::exemption_spouse)
-   (->InputLine ::dependents)
-   (makeline ::exemptions_number (+ (if (cell-value ::exemption_self) 1 0)
+  [(make-code-input-line ::filing_status) ; IRS1040/IndividualReturnFilingStatusCd/text()
+   (make-boolean-input-line ::exemption_self)
+   (make-boolean-input-line ::exemption_spouse)
+   (make-input-line ::dependents)
+   (make-formula-line ::exemptions_number (+ (if (cell-value ::exemption_self) 1 0)
                                     (if (cell-value ::exemption_spouse) 1 0)
                                     (cell-value ::dependents)))
 
-   (->InputLine ::wages) ; TODO
-   (->InputLine ::taxable_interest) ; TODO
-   (->InputLine ::tax_exempt_interest) ; TODO
-   (->InputLine ::ordinary_dividends) ; TODO
-   (->InputLine ::qualified_dividends) ; TODO
+   (make-input-line ::wages) ; TODO
+   (make-input-line ::taxable_interest) ; TODO
+   (make-input-line ::tax_exempt_interest) ; TODO
+   (make-input-line ::ordinary_dividends) ; TODO
+   (make-input-line ::qualified_dividends) ; TODO
 
-   (->InputLine ::last_year_refund)
-   (->InputLine ::last_year_itemized_deductions)
-   (->CodeInputLine ::last_year_filing_status)
-   (->BooleanInputLine ::last_year_senior)
-   (->BooleanInputLine ::last_year_spouse_senior)
-   (->BooleanInputLine ::last_year_blind)
-   (->BooleanInputLine ::last_year_spouse_blind)
-   (makeline ::taxable_tax_refunds ; TODO: The instructions are full of exceptions that aren't captured here yet, see publication 525 for complete details
+   (make-input-line ::last_year_refund)
+   (make-input-line ::last_year_itemized_deductions)
+   (make-code-input-line ::last_year_filing_status)
+   (make-boolean-input-line ::last_year_senior)
+   (make-boolean-input-line ::last_year_spouse_senior)
+   (make-boolean-input-line ::last_year_blind)
+   (make-boolean-input-line ::last_year_spouse_blind)
+   (make-formula-line ::taxable_tax_refunds ; TODO: The instructions are full of exceptions that aren't captured here yet, see publication 525 for complete details
              (min (cell-value ::last_year_refund)
                   (max (- (cell-value ::last_year_itemized_deductions)
                           (case (cell-value ::last_year_filing_status)
@@ -53,22 +53,22 @@
                                SINGLE 1550
                                HEAD_OF_HOUSEHOLD 1550))) 0))) ; IRS1040/StateLocalIncomeTaxRefundAmt/text()
 
-   (->InputLine ::alimony_received) ; TODO
-   (->InputLine ::business_income_loss) ; TODO
-   (->InputLine ::capital_gain_loss) ; TODO
-   (->InputLine ::other_gain_loss) ; TODO
-   (->InputLine ::ira_distributions) ; TODO
-   (->InputLine ::ira_distributions_taxable) ; TODO
-   (->InputLine ::pensions_annuities) ; TODO
-   (->InputLine ::pensions_annuities_taxable) ; TODO
-   (->InputLine ::schedule_e_income) ; TODO
-   (->InputLine ::farm_income_loss) ; TODO
-   (->InputLine ::unemployment_compensation) ; TODO
-   (->InputLine ::social_security_benefits) ; TODO
-   (->InputLine ::social_security_benefits_taxable) ; TODO
-   (->InputLine ::other_income) ; TODO
+   (make-input-line ::alimony_received) ; TODO
+   (make-input-line ::business_income_loss) ; TODO
+   (make-input-line ::capital_gain_loss) ; TODO
+   (make-input-line ::other_gain_loss) ; TODO
+   (make-input-line ::ira_distributions) ; TODO
+   (make-input-line ::ira_distributions_taxable) ; TODO
+   (make-input-line ::pensions_annuities) ; TODO
+   (make-input-line ::pensions_annuities_taxable) ; TODO
+   (make-input-line ::schedule_e_income) ; TODO
+   (make-input-line ::farm_income_loss) ; TODO
+   (make-input-line ::unemployment_compensation) ; TODO
+   (make-input-line ::social_security_benefits) ; TODO
+   (make-input-line ::social_security_benefits_taxable) ; TODO
+   (make-input-line ::other_income) ; TODO
 
-   (makeline ::magi_total_income (+ (cell-value ::wages)
+   (make-formula-line ::magi_total_income (+ (cell-value ::wages)
                                     (cell-value ::taxable_interest)
                                     (cell-value ::ordinary_dividends)
                                     (cell-value ::taxable_tax_refunds)
@@ -81,22 +81,22 @@
                                     (cell-value ::unemployment_compensation)
                                     (cell-value ::social_security_benefits_taxable)
                                     (cell-value ::other_income)))
-   (makeline ::total_income (+ (cell-value ::magi_total_income)
+   (make-formula-line ::total_income (+ (cell-value ::magi_total_income)
                                (cell-value ::schedule_e_income)))
 
-   (->InputLine ::educator_expenses) ; TODO
-   (->InputLine ::expenses_2106) ; TODO
-   (->InputLine ::hsa_deduction) ; TODO
-   (->InputLine ::moving_expenses) ; TODO
-   (->InputLine ::self_employment_tax_deductible) ; TODO
-   (->InputLine ::self_employed_pension_deduction) ; TODO
-   (->InputLine ::self_employed_health_insurance_deduction) ; TODO
-   (->InputLine ::early_withdrawl_penalty) ; TODO
-   (->InputLine ::alimony_paid) ; TODO
-   (->InputLine ::ira_deduction) ; TODO
+   (make-input-line ::educator_expenses) ; TODO
+   (make-input-line ::expenses_2106) ; TODO
+   (make-input-line ::hsa_deduction) ; TODO
+   (make-input-line ::moving_expenses) ; TODO
+   (make-input-line ::self_employment_tax_deductible) ; TODO
+   (make-input-line ::self_employed_pension_deduction) ; TODO
+   (make-input-line ::self_employed_health_insurance_deduction) ; TODO
+   (make-input-line ::early_withdrawl_penalty) ; TODO
+   (make-input-line ::alimony_paid) ; TODO
+   (make-input-line ::ira_deduction) ; TODO
 
-   (->InputLine ::student_loan_interest)
-   (makeline ::student_loan_interest_deduction
+   (make-input-line ::student_loan_interest)
+   (make-formula-line ::student_loan_interest_deduction
              (let [loans_maxed (min (cell-value ::student_loan_interest) 2500)
                    income_limit (if (= (cell-value ::filing_status)
                                        MARRIED_FILING_JOINTLY)
@@ -112,9 +112,9 @@
                 (- loans_maxed phased_out_loans)
                 0)))
 
-   (->InputLine ::tuition_fees_deduction) ; TODO
-   (->InputLine ::domestic_production_activities_deduction) ; TODO
-   (makeline ::agi_deductions (+ (cell-value ::educator_expenses)
+   (make-input-line ::tuition_fees_deduction) ; TODO
+   (make-input-line ::domestic_production_activities_deduction) ; TODO
+   (make-formula-line ::agi_deductions (+ (cell-value ::educator_expenses)
                                  (cell-value ::expenses_2106)
                                  (cell-value ::hsa_deduction)
                                  (cell-value ::moving_expenses)
@@ -127,23 +127,23 @@
                                  (cell-value ::student_loan_interest_deduction)
                                  (cell-value ::tuition_fees_deduction)
                                  (cell-value ::domestic_production_activities_deduction)))
-   (makeline ::agi (- (cell-value ::total_income) (cell-value ::agi_deductions)))
+   (make-formula-line ::agi (- (cell-value ::total_income) (cell-value ::agi_deductions)))
 
-   (->BooleanInputLine ::senior)
-   (->BooleanInputLine ::spouse_senior)
-   (->BooleanInputLine ::blind)
-   (->BooleanInputLine ::spouse_blind)
-   (->BooleanInputLine ::spouse_itemizes_separately)
-   (->BooleanInputLine ::dual_status_alien)
-   (makeline ::senior_blind_total (+ (if (cell-value ::senior) 1 0)
+   (make-boolean-input-line ::senior)
+   (make-boolean-input-line ::spouse_senior)
+   (make-boolean-input-line ::blind)
+   (make-boolean-input-line ::spouse_blind)
+   (make-boolean-input-line ::spouse_itemizes_separately)
+   (make-boolean-input-line ::dual_status_alien)
+   (make-formula-line ::senior_blind_total (+ (if (cell-value ::senior) 1 0)
                                      (if (cell-value ::spouse_senior) 1 0)
                                      (if (cell-value ::blind) 1 0)
                                      (if (cell-value ::spouse_blind) 1 0)))
-   (makeline ::earned_income (+ (cell-value ::wages)
+   (make-formula-line ::earned_income (+ (cell-value ::wages)
                                 (cell-value ::business_income_loss)
                                 (cell-value ::farm_income_loss)
                                 (- (cell-value ::self_employment_tax_deductible))))
-   (makeline ::standard_deduction (cond
+   (make-formula-line ::standard_deduction (cond
                                    ; Exception 1 - dependent
                                     (if (= (cell-value ::filing_status) MARRIED_FILING_JOINTLY)
                                       (not (and (cell-value ::exemption_self) (cell-value ::exemption_spouse)))
@@ -198,16 +198,16 @@
                                       MARRIED_FILING_JOINTLY 12600
                                       QUALIFYING_WIDOW_WIDOWER 12600
                                       HEAD_OF_HOUSEHOLD 9250)))
-   (->InputLine ::itemized_deductions) ; TODO, schedule A
-   (makeline ::deductions (max (cell-value ::standard_deduction) (cell-value ::itemized_deductions))) ; TODO: "In most cases, your federal income tax will be less if you take the larger of your itemized  deductions  or  standard  deduction." Should this be surfaced as a choice in case the lesser deduction makes more sense?
-   (makeline ::agi_minus_deductions (- (cell-value ::agi) (cell-value ::deductions)))
-   (makeline ::exemptions_ceiling (case (cell-value ::filing_status)
+   (make-input-line ::itemized_deductions) ; TODO, schedule A
+   (make-formula-line ::deductions (max (cell-value ::standard_deduction) (cell-value ::itemized_deductions))) ; TODO: "In most cases, your federal income tax will be less if you take the larger of your itemized  deductions  or  standard  deduction." Should this be surfaced as a choice in case the lesser deduction makes more sense?
+   (make-formula-line ::agi_minus_deductions (- (cell-value ::agi) (cell-value ::deductions)))
+   (make-formula-line ::exemptions_ceiling (case (cell-value ::filing_status)
                                     SINGLE 258250
                                     MARRIED_FILING_JOINTLY 309900
                                     QUALIFYING_WIDOW_WIDOWER 309900
                                     MARRIED_FILING_SEPARATELY 154950
                                     HEAD_OF_HOUSEHOLD 284050))
-   (makeline ::exemptions (cond
+   (make-formula-line ::exemptions (cond
                            ; Deduction for exemptions worksheet, line 1
                             (<= (cell-value ::agi) (cell-value ::exemptions_ceiling))
                             (* 4000 (cell-value ::exemptions_number))
@@ -226,8 +226,8 @@
                                          (if (= (cell-value ::filing_status) MARRIED_FILING_SEPARATELY)
                                            1250
                                            2500)))))))
-   (makeline ::taxable_income (max 0 (- (cell-value ::agi_minus_deductions) (cell-value ::exemptions))))
-   (makeline ::tax (case (cell-value ::filing_status)
+   (make-formula-line ::taxable_income (max 0 (- (cell-value ::agi_minus_deductions) (cell-value ::exemptions))))
+   (make-formula-line ::tax (case (cell-value ::filing_status)
                      SINGLE
                      (condp > (cell-value ::taxable_income)
                        9225 (* 0.1 (cell-value ::taxable_income))
@@ -274,35 +274,35 @@
                        439000 (+ 115737 (* 0.35 (- (cell-value ::taxable_income) 411500)))
                        (+ 125362 (* 0.396 (- (cell-value ::taxable_income) 439000))))))
   ; TODO: Form 8814, Form 4972, section 962 election, Form 8863, Form 8621 taxes
-   (->InputLine ::alternative_minimum_tax) ; TODO
-   (->InputLine ::premium_credit_repayment) ; TODO
-   (makeline ::pretotal_tax (+ (cell-value ::tax)
+   (make-input-line ::alternative_minimum_tax) ; TODO
+   (make-input-line ::premium_credit_repayment) ; TODO
+   (make-formula-line ::pretotal_tax (+ (cell-value ::tax)
                                (cell-value ::alternative_minimum_tax)
                                (cell-value ::premium_credit_repayment)))
-   (->InputLine ::foreign_tax_credit) ; TODO
-   (->InputLine ::child_dependent_care_credit) ; TODO
-   (->InputLine ::education_credits) ; TODO
-   (->InputLine ::retirement_savings_contributions_credit) ; TODO
-   (->InputLine ::child_tax_credit) ; TODO
-   (->InputLine ::residential_energy_credits) ; TODO
-   (->InputLine ::other_credits) ; TODO
-   (makeline ::total_credits (+ (cell-value ::foreign_tax_credit)
+   (make-input-line ::foreign_tax_credit) ; TODO
+   (make-input-line ::child_dependent_care_credit) ; TODO
+   (make-input-line ::education_credits) ; TODO
+   (make-input-line ::retirement_savings_contributions_credit) ; TODO
+   (make-input-line ::child_tax_credit) ; TODO
+   (make-input-line ::residential_energy_credits) ; TODO
+   (make-input-line ::other_credits) ; TODO
+   (make-formula-line ::total_credits (+ (cell-value ::foreign_tax_credit)
                                 (cell-value ::child_dependent_care_credit)
                                 (cell-value ::education_credits)
                                 (cell-value ::retirement_savings_contributions_credit)
                                 (cell-value ::child_tax_credit)
                                 (cell-value ::residential_energy_credits)
                                 (cell-value ::other_credits)))
-   (makeline ::tax_minus_credits (max (- (cell-value ::pretotal_tax) (cell-value ::total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0))
+   (make-formula-line ::tax_minus_credits (max (- (cell-value ::pretotal_tax) (cell-value ::total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0))
 
-   (->InputLine ::self_employment_tax) ; TODO
-   (->InputLine ::unreported_social_security_medicare_tax) ; TODO
-   (->InputLine ::additional_tax_retirement_plans) ; TODO
-   (->InputLine ::household_employment_taxes) ; TODO
-   (->InputLine ::first_time_homebuyer_credit_repayment) ; TODO
-   (->InputLine ::health_care_individual_responsibility) ; TODO
-   (->InputLine ::other_taxes) ; TODO
-   (makeline ::total_tax (+ (cell-value ::tax_minus_credits)
+   (make-input-line ::self_employment_tax) ; TODO
+   (make-input-line ::unreported_social_security_medicare_tax) ; TODO
+   (make-input-line ::additional_tax_retirement_plans) ; TODO
+   (make-input-line ::household_employment_taxes) ; TODO
+   (make-input-line ::first_time_homebuyer_credit_repayment) ; TODO
+   (make-input-line ::health_care_individual_responsibility) ; TODO
+   (make-input-line ::other_taxes) ; TODO
+   (make-formula-line ::total_tax (+ (cell-value ::tax_minus_credits)
                             (cell-value ::self_employment_tax)
                             (cell-value ::unreported_social_security_medicare_tax)
                             (cell-value ::additional_tax_retirement_plans)
@@ -311,17 +311,17 @@
                             (cell-value ::health_care_individual_responsibility)
                             (cell-value ::other_taxes)))
 
-   (->InputLine ::federal_tax_withheld)
-   (->InputLine ::estimated_tax_payments)
-   (->InputLine ::earned_income_credit)
-   (->InputLine ::additional_child_tax_credit)
-   (->InputLine ::american_opportunity_credit)
-   (->InputLine ::net_premium_tax_credit)
-   (->InputLine ::payment_with_extension_request)
-   (->InputLine ::excess_social_security_withheld)
-   (->InputLine ::federal_fuel_tax_credit)
-   (->InputLine ::other_credits_payments)
-   (makeline ::total_payments (+ (cell-value ::federal_tax_withheld)
+   (make-input-line ::federal_tax_withheld)
+   (make-input-line ::estimated_tax_payments)
+   (make-input-line ::earned_income_credit)
+   (make-input-line ::additional_child_tax_credit)
+   (make-input-line ::american_opportunity_credit)
+   (make-input-line ::net_premium_tax_credit)
+   (make-input-line ::payment_with_extension_request)
+   (make-input-line ::excess_social_security_withheld)
+   (make-input-line ::federal_fuel_tax_credit)
+   (make-input-line ::other_credits_payments)
+   (make-formula-line ::total_payments (+ (cell-value ::federal_tax_withheld)
                                  (cell-value ::estimated_tax_payments)
                                  (cell-value ::earned_income_credit)
                                  (cell-value ::additional_child_tax_credit)
@@ -331,5 +331,5 @@
                                  (cell-value ::excess_social_security_withheld)
                                  (cell-value ::federal_fuel_tax_credit)
                                  (cell-value ::other_credits_payments)))
-   (makeline ::refund (max 0 (- (cell-value ::total_payments) (cell-value ::total_tax))))
-   (makeline ::tax_owed (max 0 (- (cell-value ::total_tax) (cell-value ::total_payments))))])
+   (make-formula-line ::refund (max 0 (- (cell-value ::total_payments) (cell-value ::total_tax))))
+   (make-formula-line ::tax_owed (max 0 (- (cell-value ::total_tax) (cell-value ::total_payments))))])

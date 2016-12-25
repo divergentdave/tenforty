@@ -11,19 +11,19 @@
     (is (= #{:pretotal_tax :total_credits} (data-dependencies '(- (cell-value :pretotal_tax) (cell-value :total_credits)))))
     (is (= #{:AGI} (data-dependencies '(let [temp (cell-value :AGI)] temp))))))
 
-(deftest makeline-no-deps
+(deftest make-formula-line-no-deps
   (testing "Macro to create a line with a degenerate expression"
     (let [myline
-          (makeline ::myline 0)]
+          (make-formula-line ::myline 0)]
       (is (= ::myline (:kw myline)))
       (is (fn? (:fn myline)))
       (is (= #{} (:deps myline)))
       (is (== 0 ((:fn myline) (fn [kw] 1234)))))))
 
-(deftest makeline-test
+(deftest make-formula-line-test
   (testing "Macro to create a line with an expression"
     (let [tax_minus_credits
-          (makeline :tenforty.forms.ty2015.f1040/tax_minus_credits (max (- (cell-value :tenforty.forms.ty2015.f1040/pretotal_tax) (cell-value :tenforty.forms.ty2015.f1040/total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0))]
+          (make-formula-line :tenforty.forms.ty2015.f1040/tax_minus_credits (max (- (cell-value :tenforty.forms.ty2015.f1040/pretotal_tax) (cell-value :tenforty.forms.ty2015.f1040/total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0))]
       (is (= :tenforty.forms.ty2015.f1040/tax_minus_credits) (:kw tax_minus_credits))
       (is (fn? (:fn tax_minus_credits)))
       (is (= #{:tenforty.forms.ty2015.f1040/pretotal_tax :tenforty.forms.ty2015.f1040/total_credits :tenforty.forms.ty2015.s8812/ctc} (:deps tax_minus_credits)))
@@ -36,7 +36,7 @@
   (is (= {} form))
   (defform
     nil
-    [(makeline ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])
+    [(make-formula-line ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])
   (is (= ::refund (:kw (::refund (get form nil)))))
   (is (= #{::total_payments ::total_tax} (:deps (::refund (get form nil))))))
 
@@ -44,14 +44,14 @@
   (is (thrown? IllegalArgumentException
                (defform
                  nil
-                 [(->InputLine ::a)
-                  (->InputLine ::a)])))
+                 [(make-input-line ::a)
+                  (make-input-line ::a)])))
   (is (thrown? IllegalArgumentException
                (defform
                  :f1
-                 [(->InputLine ::a)]
+                 [(make-input-line ::a)]
                  :f2
-                 [(->InputLine ::a)]))))
+                 [(make-input-line ::a)]))))
 
 (deftest duplicate-group-test
   (is (thrown? IllegalArgumentException
@@ -76,16 +76,16 @@
     (is (= 30 (lookup situation ::b)))))
 
 (deftest calculate-test
-  (let [form {:a (makeline :a (if (cell-value :b)
+  (let [form {:a (make-formula-line :a (if (cell-value :b)
                                 (cell-value :c)
                                 (cell-value :d)))
-              :b (->BooleanInputLine :b)
-              :c (->InputLine :c)
-              :d (->InputLine :d)
-              :e (makeline :e (cell-value :z))
-              :z (->InputLine :z)
-              :true (->BooleanInputLine :true)
-              :false (->BooleanInputLine :false)}
+              :b (make-boolean-input-line :b)
+              :c (make-input-line :c)
+              :d (make-input-line :d)
+              :e (make-formula-line :e (cell-value :z))
+              :z (make-input-line :z)
+              :true (make-boolean-input-line :true)
+              :false (make-boolean-input-line :false)}
         situation (->MapTaxSituation {:b true
                                       :c 5
                                       :d 10

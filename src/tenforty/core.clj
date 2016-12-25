@@ -55,12 +55,16 @@
   (eval-line [self cell-value] (cell-value (:kw self)))
   (get-deps [self] #{}))
 
+(defn make-input-line [kw] (->InputLine kw))
+
 (defrecord CodeInputLine [kw]
   LineMethods
   (get-keyword [self] (:kw self))
   (get-name [self] (name (:kw self)))
   (eval-line [self cell-value] (cell-value (:kw self)))
   (get-deps [self] #{}))
+
+(defn make-code-input-line [kw] (->CodeInputLine kw))
 
 (defrecord BooleanInputLine [kw]
   LineMethods
@@ -69,6 +73,8 @@
   (eval-line [self cell-value] (cell-value (:kw self)))
   (get-deps [self] #{}))
 
+(defn make-boolean-input-line [kw] (->BooleanInputLine kw))
+
 (defrecord FormulaLine [kw fn deps]
   LineMethods
   (get-keyword [self] (:kw self))
@@ -76,7 +82,7 @@
   (eval-line [self cell-value] ((:fn self) cell-value))
   (get-deps [self] (:deps self)))
 
-(defmacro makeline
+(defmacro make-formula-line
   [kw expression]
   (list 'tenforty.core/->FormulaLine kw (list 'fn ['cell-value] expression) (data-dependencies expression)))
 

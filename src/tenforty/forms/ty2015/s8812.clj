@@ -3,5 +3,5 @@
 
 (defform
   nil
-  [(->InputLine ::ctc) ; TODO
+  [(make-input-line ::ctc) ; TODO
    ])
