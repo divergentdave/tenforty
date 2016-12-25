@@ -4,36 +4,36 @@
 
 (deftest data-deps
   (testing "Get data dependencies from a quoted form"
-    (is (= (data-dependencies '(cell-value :AGI)) #{:AGI}))
-    (is (= (data-dependencies '(+ 1 1)) #{}))
-    (is (= (data-dependencies '(identity 0)) #{}))
-    (is (= (data-dependencies '(+ (cell-value :AGI) 1)) #{:AGI}))
-    (is (= (data-dependencies '(- (cell-value :pretotal_tax) (cell-value :total_credits))) #{:pretotal_tax :total_credits}))
-    (is (= (data-dependencies '(let [temp (cell-value :AGI)] temp)) #{:AGI}))))
+    (is (= #{:AGI}) (data-dependencies '(cell-value :AGI)))
+    (is (= #{} (data-dependencies '(+ 1 1))))
+    (is (= #{} (data-dependencies '(identity 0))))
+    (is (= #{:AGI} (data-dependencies '(+ (cell-value :AGI) 1))))
+    (is (= #{:pretotal_tax :total_credits} (data-dependencies '(- (cell-value :pretotal_tax) (cell-value :total_credits)))))
+    (is (= #{:AGI} (data-dependencies '(let [temp (cell-value :AGI)] temp))))))
 
 (deftest makeline-no-deps
   (testing "Macro to create a line with a degenerate expression"
     (let [myline
           (makeline ::myline 0)]
-      (is (= (:kw myline) ::myline))
+      (is (= ::myline (:kw myline)))
       (is (fn? (:fn myline)))
-      (is (= (:deps myline) #{}))
-      (is (== ((:fn myline) (fn [kw] 1234)) 0)))))
+      (is (= #{} (:deps myline)))
+      (is (== 0 ((:fn myline) (fn [kw] 1234)))))))
 
 (deftest makeline-test
   (testing "Macro to create a line with an expression"
     (let [tax_minus_credits
           (makeline :tenforty.forms.ty2015.f1040/tax_minus_credits (max (- (cell-value :tenforty.forms.ty2015.f1040/pretotal_tax) (cell-value :tenforty.forms.ty2015.f1040/total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0))]
-      (is (= (:kw tax_minus_credits) :tenforty.forms.ty2015.f1040/tax_minus_credits))
+      (is (= :tenforty.forms.ty2015.f1040/tax_minus_credits) (:kw tax_minus_credits))
       (is (fn? (:fn tax_minus_credits)))
-      (is (= (:deps tax_minus_credits) #{:tenforty.forms.ty2015.f1040/pretotal_tax :tenforty.forms.ty2015.f1040/total_credits :tenforty.forms.ty2015.s8812/ctc}))
-      (is (== ((:fn tax_minus_credits) (fn [kw] 0)) 0))
-      (is (== ((:fn tax_minus_credits) (fn [kw] 1)) 0))
-      (is (== ((:fn tax_minus_credits) (fn [kw] -1)) 1)))))
+      (is (= #{:tenforty.forms.ty2015.f1040/pretotal_tax :tenforty.forms.ty2015.f1040/total_credits :tenforty.forms.ty2015.s8812/ctc} (:deps tax_minus_credits)))
+      (is (== 0 ((:fn tax_minus_credits) (fn [kw] 0))))
+      (is (== 0 ((:fn tax_minus_credits) (fn [kw] 1))))
+      (is (== 1 ((:fn tax_minus_credits) (fn [kw] -1)))))))
 
 (deftest defform-test
   (defform)
-  (is (= form {}))
+  (is (= {} form))
   (defform
     nil
     [(makeline ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])
