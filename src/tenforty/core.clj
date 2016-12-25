@@ -114,7 +114,9 @@
        (def ~'form (reduce (fn [~map_acc ~part]
                              (merge
                               ~map_acc
-                              (zipmap (map :kw (second ~part)) (second ~part))))
+                              (zipmap (map :kw (second ~part))
+                                      (map #(assoc % :group (first ~part))
+                                           (second ~part)))))
                            {}
                            (partition 2 ~l))))))
 

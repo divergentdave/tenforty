@@ -35,10 +35,11 @@
   (defform)
   (is (= {} form))
   (defform
-    nil
+    :mygroup
     [(make-formula-line ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])
   (is (= ::refund (:kw (::refund form))))
-  (is (= #{::total_payments ::total_tax} (:deps (::refund form)))))
+  (is (= #{::total_payments ::total_tax} (:deps (::refund form))))
+  (is (= :mygroup (get-group (::refund form)))))
 
 (deftest duplicate-line-test
   (is (thrown? IllegalArgumentException
