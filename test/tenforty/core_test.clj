@@ -35,15 +35,31 @@
   (defform)
   (is (= form {}))
   (defform
-    (makeline ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0)))
-  (is (= (:kw (::refund form)) ::refund))
-  (is (= (:deps (::refund form)) #{::total_payments ::total_tax})))
+    nil
+    [(makeline ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])
+  (is (= ::refund (:kw (::refund (get form nil)))))
+  (is (= #{::total_payments ::total_tax} (:deps (::refund (get form nil))))))
 
 (deftest duplicate-line-test
   (is (thrown? IllegalArgumentException
                (defform
-                 (->InputLine ::a)
-                 (->InputLine ::a)))))
+                 nil
+                 [(->InputLine ::a)
+                  (->InputLine ::a)])))
+  (is (thrown? IllegalArgumentException
+               (defform
+                 :f1
+                 [(->InputLine ::a)]
+                 :f2
+                 [(->InputLine ::a)]))))
+
+(deftest duplicate-group-test
+  (is (thrown? IllegalArgumentException
+               (defform
+                 :f1
+                 []
+                 :f1
+                 []))))
 
 (deftest zero-tax-situation-test
   (is (= 0 (lookup (->ZeroTaxSituation) ::a))))

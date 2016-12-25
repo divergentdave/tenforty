@@ -81,15 +81,29 @@
   (list 'tenforty.core/->FormulaLine kw (list 'fn ['cell-value] expression) (data-dependencies expression)))
 
 (defmacro defform
-  [& lines]
-  (let [sym (gensym)
+  [& args]
+  (let [l (gensym "l")
+        map_acc (gensym "map_acc")
+        part (gensym "part")
         coll (gensym "coll")
         obj (gensym "obj")]
-    `(let [~sym (list ~@lines)]
+    `(let [~l (list ~@args)]
+       (reduce (fn [~coll ~part] (if (contains? ~coll (first ~part))
+                                   (throw (IllegalArgumentException. (str "More than one group uses the keyword " (first ~part))))
+                                   (conj ~coll (first ~part))))
+               #{} (partition 2 ~l))
        (reduce (fn [~coll ~obj] (if (contains? ~coll (:kw ~obj))
                                   (throw (IllegalArgumentException. (str "More than one line uses the keyword " (:kw ~obj))))
-                                  (conj ~coll (:kw ~obj)))) #{} ~sym)
-       (def ~'form (zipmap (map :kw ~sym) ~sym)))))
+                                  (conj ~coll (:kw ~obj))))
+               #{} (apply concat (map second (partition 2 ~l))))
+
+       (def ~'form (reduce (fn [~map_acc ~part]
+                             (assoc
+                              ~map_acc
+                              (first ~part)
+                              (zipmap (map :kw (second ~part)) (second ~part))))
+                           {}
+                           (partition 2 ~l))))))
 
 (defprotocol TaxSituation
   (lookup [self kw]))

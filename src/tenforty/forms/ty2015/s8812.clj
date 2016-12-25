@@ -2,5 +2,6 @@
   (:use tenforty.core))
 
 (defform
-  (->InputLine ::ctc) ; TODO
-  )
+  nil
+  [(->InputLine ::ctc) ; TODO
+   ])
