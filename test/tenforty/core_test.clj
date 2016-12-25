@@ -37,8 +37,8 @@
   (defform
     nil
     [(make-formula-line ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])
-  (is (= ::refund (:kw (::refund (get form nil)))))
-  (is (= #{::total_payments ::total_tax} (:deps (::refund (get form nil))))))
+  (is (= ::refund (:kw (::refund form))))
+  (is (= #{::total_payments ::total_tax} (:deps (::refund form)))))
 
 (deftest duplicate-line-test
   (is (thrown? IllegalArgumentException
@@ -52,14 +52,6 @@
                  [(make-input-line ::a)]
                  :f2
                  [(make-input-line ::a)]))))
-
-(deftest duplicate-group-test
-  (is (thrown? IllegalArgumentException
-               (defform
-                 :f1
-                 []
-                 :f1
-                 []))))
 
 (deftest zero-tax-situation-test
   (is (= 0 (lookup (->ZeroTaxSituation) ::a))))
