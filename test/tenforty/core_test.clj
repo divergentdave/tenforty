@@ -69,8 +69,8 @@
 
 (deftest calculate-test
   (let [form {:a (make-formula-line :a (if (cell-value :b)
-                                (cell-value :c)
-                                (cell-value :d)))
+                                         (cell-value :c)
+                                         (cell-value :d)))
               :b (make-boolean-input-line :b)
               :c (make-input-line :c)
               :d (make-input-line :d)
