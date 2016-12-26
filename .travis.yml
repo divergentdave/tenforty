@@ -1,1 +1,4 @@
 language: clojure
+script:
+  - lein with-profile +dev cljfmt check
+  - lein test
