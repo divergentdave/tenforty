@@ -115,7 +115,7 @@
                              (merge
                               ~map_acc
                               (zipmap (map :kw (second ~part))
-                                      (map #(assoc % :group (first ~part))
+                                      (map #(assoc % :group (first (first ~part)))
                                            (second ~part)))))
                            {}
                            (partition 2 ~l))))))

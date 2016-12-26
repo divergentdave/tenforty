@@ -11,7 +11,7 @@
 (def ^:const QUALIFYING_WIDOW_WIDOWER 5)
 
 (defform
-  nil
+  [nil]
   [(make-code-input-line ::filing_status) ; IRS1040/IndividualReturnFilingStatusCd/text()
    (make-boolean-input-line ::exemption_self)
    (make-boolean-input-line ::exemption_spouse)
