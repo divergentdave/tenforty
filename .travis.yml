@@ -1,4 +1,5 @@
 language: clojure
+install: lein with-profile +dev deps
 script:
   - lein with-profile +dev cljfmt check
   - lein test
