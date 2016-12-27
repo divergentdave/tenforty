@@ -36,7 +36,7 @@
    (make-formula-line ::taxable_tax_refunds ; TODO: The instructions are full of exceptions that aren't captured here yet, see publication 525 for complete details
                       (min (cell-value ::last_year_refund)
                            (max (- (cell-value ::last_year_itemized_deductions)
-                                   (case (cell-value ::last_year_filing_status)
+                                   (condp = (cell-value ::last_year_filing_status)
                                      SINGLE 6200
                                      MARRIED_FILING_SEPARATELY 6200
                                      MARRIED_FILING_JOINTLY 12400
@@ -46,7 +46,7 @@
                                          (if (cell-value ::last_year_spouse_senior) 1 0)
                                          (if (cell-value ::last_year_blind) 1 0)
                                          (if (cell-value ::last_year_spouse_blind) 1 0))
-                                      (case (cell-value ::last_year_filing_status)
+                                      (condp = (cell-value ::last_year_filing_status)
                                         MARRIED_FILING_SEPARATELY 1200
                                         MARRIED_FILING_JOINTLY 1200
                                         QUALIFYING_WIDOW_WIDOWER 1200
@@ -150,14 +150,14 @@
                                                (not (cell-value ::exemption_self)))
                                              (+ ; Standard Deduction Worksheet for Dependents
                                               (min (+ 350 (max 700 (cell-value ::earned_income)))
-                                                   (case (cell-value ::filing_status)
+                                                   (condp = (cell-value ::filing_status)
                                                      SINGLE 6300
                                                      MARRIED_FILING_SEPARATELY 6300
                                                      MARRIED_FILING_JOINTLY 12600
                                                      QUALIFYING_WIDOW_WIDOWER 12600 ; not on worksheet, but inferred
                                                      HEAD_OF_HOUSEHOLD 9250))
                                               (* (cell-value ::senior_blind_total)
-                                                 (case (cell-value ::filing_status)
+                                                 (condp = (cell-value ::filing_status)
                                                    MARRIED_FILING_JOINTLY 1250
                                                    QUALIFYING_WIDOW_WIDOWER 1250
                                                    MARRIED_FILING_SEPARATELY 1250
@@ -165,7 +165,7 @@
                                                    HEAD_OF_HOUSEHOLD 1550)))
                                    ; Exception 2 - box on line 39a checked
                                              (> (cell-value ::senior_blind_total) 0)
-                                             (case (cell-value ::filing_status)
+                                             (condp = (cell-value ::filing_status)
                                                SINGLE (case (cell-value ::senior_blind_total)
                                                         1 7850
                                                         2 9400)
@@ -192,16 +192,16 @@
                                              0
                                    ; All others
                                              true
-                                             (case (cell-value ::filing_status)
+                                             (condp = (cell-value ::filing_status)
                                                SINGLE 6300
-                                               MARRIED_FILING_SEPAREATELY 6300
+                                               MARRIED_FILING_SEPARATELY 6300
                                                MARRIED_FILING_JOINTLY 12600
                                                QUALIFYING_WIDOW_WIDOWER 12600
                                                HEAD_OF_HOUSEHOLD 9250)))
    (make-input-line ::itemized_deductions) ; TODO, schedule A
    (make-formula-line ::deductions (max (cell-value ::standard_deduction) (cell-value ::itemized_deductions))) ; TODO: "In most cases, your federal income tax will be less if you take the larger of your itemized  deductions  or  standard  deduction." Should this be surfaced as a choice in case the lesser deduction makes more sense?
    (make-formula-line ::agi_minus_deductions (- (cell-value ::agi) (cell-value ::deductions)))
-   (make-formula-line ::exemptions_ceiling (case (cell-value ::filing_status)
+   (make-formula-line ::exemptions_ceiling (condp = (cell-value ::filing_status)
                                              SINGLE 258250
                                              MARRIED_FILING_JOINTLY 309900
                                              QUALIFYING_WIDOW_WIDOWER 309900
@@ -227,7 +227,7 @@
                                                     1250
                                                     2500)))))))
    (make-formula-line ::taxable_income (max 0 (- (cell-value ::agi_minus_deductions) (cell-value ::exemptions))))
-   (make-formula-line ::tax (case (cell-value ::filing_status)
+   (make-formula-line ::tax (condp = (cell-value ::filing_status)
                               SINGLE
                               (condp > (cell-value ::taxable_income)
                                 9225 (* 0.1 (cell-value ::taxable_income))
