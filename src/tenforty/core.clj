@@ -127,46 +127,19 @@
                                  (partition 2 ~l)))]
          (def ~'form (->FormSubgraph ~lines ~groups))))))
 
-(defprotocol TaxSituation
-  (lookup [self kw]))
+(defprotocol GroupValues
+  (lookup-value [self kw])
+  (lookup-group [self kw]))
 
 (defrecord ZeroTaxSituation []
-  TaxSituation
-  (lookup [self kw] 0))
+  GroupValues
+  (lookup-value [self kw] 0)
+  (lookup-group [self kw] self))
 
-(defrecord MapTaxSituation [data]
-  TaxSituation
-  (lookup [self kw] (kw (:data self))))
-
-(defrecord CompositeTaxSituation [situations]
-  TaxSituation
-  (lookup [self kw] (first (keep #(lookup % kw) (:situations self)))))
-
-(defrecord TenfortyContext [lines situation cache])
-
-(defn make-context
-  [lines situation]
-  (->TenfortyContext lines situation (atom {})))
-
-(defn calculate
-  ([lines kw situation]
-   (calculate (make-context lines situation) kw))
-  ([context kw]
-   (let [line (kw (:lines context))]
-     (cond
-       (instance? FormulaLine line)
-       (if-let [entry (find @(:cache context) kw)]
-         (val entry)
-         (let [retval (eval-line line #(calculate context %))]
-           (swap! (:cache context) assoc kw retval)
-           retval))
-       (or (instance? InputLine line)
-           (instance? CodeInputLine line)
-           (instance? BooleanInputLine line))
-       (let [value (lookup (:situation context) kw)]
-         (if (nil? value)
-           (throw (Exception. (str "Tax situation has no value for " kw)))
-           value))))))
+(defrecord MapTaxSituation [values groups]
+  GroupValues
+  (lookup-value [self kw] (kw (:values self)))
+  (lookup-group [self kw] (kw (:groups self))))
 
 (defrecord FormSubgraph [lines groups])
 
@@ -174,3 +147,36 @@
   [& subgraphs]
   (->FormSubgraph (apply merge (map :lines subgraphs))
                   (apply merge-with clojure.set/union (map :groups subgraphs))))
+
+(defrecord TenfortyContext [form-subgraph situation group parent-context value-cache])
+
+(defn make-context
+  ([form-subgraph situation]
+   (make-context form-subgraph situation nil))
+  ([form-subgraph situation group]
+   (make-context form-subgraph situation group nil))
+  ([form-subgraph situation group parent-context]
+   (->TenfortyContext form-subgraph situation group parent-context (atom {}))))
+
+(defn calculate
+  ([form-subgraph kw situation]
+   (calculate (make-context form-subgraph situation) kw))
+  ([form-subgraph kw situation group]
+   (calculate (make-context form-subgraph situation group) kw))
+  ([context kw]
+   (let [line-entry (find (:lines (:form-subgraph context)) kw)
+         line (val line-entry)]
+     (cond
+       (instance? FormulaLine line)
+       (if-let [cache-entry (find @(:value-cache context) kw)]
+         (val cache-entry)
+         (let [retval (eval-line line #(calculate context %))]
+           (swap! (:value-cache context) assoc kw retval)
+           retval))
+       (or (instance? InputLine line)
+           (instance? CodeInputLine line)
+           (instance? BooleanInputLine line))
+       (let [value (lookup-value (:situation context) kw)]
+         (if (nil? value)
+           (throw (Exception. (str "Tax situation has no value for " kw)))
+           value))))))
