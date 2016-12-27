@@ -121,4 +121,23 @@
     []
     [:granchild #{}]
     [(make-input-line :b)])
-  (is (thrown? Throwable (calculate form :a (->ZeroTaxSituation)))))
+  (is (thrown? Throwable (calculate form :a (->ZeroTaxSituation))))
+  (defform
+    [nil #{:child}]
+    [(make-formula-line :x (apply + (cell-value :y)))]
+    [:child #{:grandchild}]
+    [(make-formula-line :y (apply + (cell-value :z)))]
+    [:grandchild #{}]
+    [(make-input-line :z)])
+  (let [situation (->MapTaxSituation
+                   {} {:child [(->MapTaxSituation
+                                {} {:grandchild [(->MapTaxSituation
+                                                  {:z 1} {})
+                                                 (->MapTaxSituation
+                                                  {:z 2} {})]})
+                               (->MapTaxSituation
+                                {} {:grandchild [(->MapTaxSituation
+                                                  {:z 3} {})
+                                                 (->MapTaxSituation
+                                                  {:z 4} {})]})]})]
+    (is (= 10 (calculate form :x situation)))))
