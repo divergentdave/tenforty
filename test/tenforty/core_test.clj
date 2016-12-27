@@ -113,4 +113,12 @@
                              (->MapTaxSituation
                               {:entry 101} {})]})]
     (is (= 119 (calculate form :sum situation)))
-    (is (= 118 (calculate form :sum_clamped situation)))))
+    (is (= 118 (calculate form :sum_clamped situation))))
+  (defform
+    [nil #{:child}]
+    [(make-formula-line :a (cell-value :b))]
+    [:child #{:grandchild}]
+    []
+    [:granchild #{}]
+    [(make-input-line :b)])
+  (is (thrown? Throwable (calculate form :a (->ZeroTaxSituation)))))
