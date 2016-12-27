@@ -1,5 +1,6 @@
 (ns tenforty.core
-  (:use clojure.walk))
+  (:use clojure.walk)
+  (:require clojure.set))
 
 (defrecord data-dependency [kw])
 
@@ -104,21 +105,27 @@
         map_acc (gensym "map_acc")
         part (gensym "part")
         coll (gensym "coll")
-        obj (gensym "obj")]
+        obj (gensym "obj")
+        lines (gensym "lines")
+        groups (gensym "groups")]
     `(let [~l (list ~@args)]
        (reduce (fn [~coll ~obj] (if (contains? ~coll (:kw ~obj))
                                   (throw (IllegalArgumentException. (str "More than one line uses the keyword " (:kw ~obj))))
                                   (conj ~coll (:kw ~obj))))
                #{} (apply concat (map second (partition 2 ~l))))
 
-       (def ~'form (reduce (fn [~map_acc ~part]
-                             (merge
-                              ~map_acc
-                              (zipmap (map :kw (second ~part))
-                                      (map #(assoc % :group (first (first ~part)))
-                                           (second ~part)))))
-                           {}
-                           (partition 2 ~l))))))
+       (let [~lines (reduce (fn [~map_acc ~part]
+                              (merge
+                               ~map_acc
+                               (zipmap (map :kw (second ~part))
+                                       (map #(assoc % :group (first (first ~part)))
+                                            (second ~part)))))
+                            {}
+                            (partition 2 ~l))
+             ~groups (apply merge-with clojure.set/union (sorted-map)
+                            (map #(sorted-map (first (first %)) (second (first %)))
+                                 (partition 2 ~l)))]
+         (def ~'form (->FormSubgraph ~lines ~groups))))))
 
 (defprotocol TaxSituation
   (lookup [self kw]))
@@ -160,3 +167,10 @@
          (if (nil? value)
            (throw (Exception. (str "Tax situation has no value for " kw)))
            value))))))
+
+(defrecord FormSubgraph [lines groups])
+
+(defn merge-subgraphs
+  [& subgraphs]
+  (->FormSubgraph (apply merge (map :lines subgraphs))
+                  (apply merge-with clojure.set/union (map :group subgraphs))))

@@ -33,15 +33,16 @@
 
 (deftest defform-test
   (defform)
-  (is (= {} form))
+  (is (= (->FormSubgraph {} {}) form))
   (defform
     [nil #{:mygroup}]
     []
     [:mygroup #{}]
     [(make-formula-line ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])
-  (is (= ::refund (:kw (::refund form))))
-  (is (= #{::total_payments ::total_tax} (:deps (::refund form))))
-  (is (= :mygroup (get-group (::refund form)))))
+  (is (= ::refund (:kw (::refund (:lines form)))))
+  (is (= #{::total_payments ::total_tax} (:deps (::refund (:lines form)))))
+  (is (= :mygroup (get-group (::refund (:lines form)))))
+  (is (= {nil #{:mygroup} :mygroup #{}} (:groups form))))
 
 (deftest duplicate-line-test
   (is (thrown? IllegalArgumentException
