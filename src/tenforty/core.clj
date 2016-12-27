@@ -148,7 +148,7 @@
   (->FormSubgraph (apply merge (map :lines subgraphs))
                   (apply merge-with clojure.set/union (map :groups subgraphs))))
 
-(defrecord TenfortyContext [form-subgraph situation group parent-context value-cache])
+(defrecord TenfortyContext [form-subgraph situation group parent-context value-cache child-context-cache])
 
 (defn make-context
   ([form-subgraph situation]
@@ -156,7 +156,39 @@
   ([form-subgraph situation group]
    (make-context form-subgraph situation group nil))
   ([form-subgraph situation group parent-context]
-   (->TenfortyContext form-subgraph situation group parent-context (atom {}))))
+   (->TenfortyContext form-subgraph situation group parent-context (atom {}) (atom {}))))
+
+(defn- find-group-parent-contexts
+  [group-kw context]
+  (let [;line (line-kw (:lines (:form-subgraph context)))
+        ;group-kw (:group line)
+        parent-context (:parent-context context)]
+    (if (= group-kw (:group context))
+      context
+      (if parent-context
+        (find-group-parent-contexts group-kw parent-context)
+        nil))))
+
+(declare calculate)
+
+(defn- calculate-context
+  [context kw]
+  (let [line-entry (find (:lines (:form-subgraph context)) kw)
+        line (val line-entry)]
+    (cond
+      (instance? FormulaLine line)
+      (if-let [cache-entry (find @(:value-cache context) kw)]
+        (val cache-entry)
+        (let [retval (eval-line line #(calculate context %))]
+          (swap! (:value-cache context) assoc kw retval)
+          retval))
+      (or (instance? InputLine line)
+          (instance? CodeInputLine line)
+          (instance? BooleanInputLine line))
+      (let [value (lookup-value (:situation context) kw)]
+        (if (nil? value)
+          (throw (Exception. (str "Tax situation has no value for " kw " in group " (:group context))))
+          value)))))
 
 (defn calculate
   ([form-subgraph kw situation]
@@ -164,19 +196,15 @@
   ([form-subgraph kw situation group]
    (calculate (make-context form-subgraph situation group) kw))
   ([context kw]
-   (let [line-entry (find (:lines (:form-subgraph context)) kw)
-         line (val line-entry)]
-     (cond
-       (instance? FormulaLine line)
-       (if-let [cache-entry (find @(:value-cache context) kw)]
-         (val cache-entry)
-         (let [retval (eval-line line #(calculate context %))]
-           (swap! (:value-cache context) assoc kw retval)
-           retval))
-       (or (instance? InputLine line)
-           (instance? CodeInputLine line)
-           (instance? BooleanInputLine line))
-       (let [value (lookup-value (:situation context) kw)]
-         (if (nil? value)
-           (throw (Exception. (str "Tax situation has no value for " kw)))
-           value))))))
+   (let [group-kw (:group (kw (:lines (:form-subgraph context))))]
+     (if-let [parent-or-self-context (find-group-parent-contexts group-kw context)]
+       (calculate-context parent-or-self-context kw)
+       (let [child-group-kws (get (:groups (:form-subgraph context)) (:group context))]
+         (if (contains? child-group-kws group-kw)
+           (if-let [cache-entry (find @(:child-context-cache context) group-kw)]
+             (map #(calculate-context % kw) (val cache-entry))
+             (let [new-contexts (map #(make-context (:form-subgraph context) % group-kw context)
+                                     (lookup-group (:situation context) group-kw))]
+               (swap! (:child-context-cache context) assoc group-kw new-contexts)
+               (map #(calculate-context % kw) new-contexts)))
+           (throw (Exception. (str "Line " kw " in group " group-kw " was referenced from group " (:group context) " but " group-kw " is not a direct child of " (:group context))))))))))

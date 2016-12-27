@@ -112,6 +112,5 @@
                               {:entry 13} {})
                              (->MapTaxSituation
                               {:entry 101} {})]})]
-    (when false ; skip for now
-      (is (= 119 (calculate form :sum situation)))
-      (is (= 118 (calculate form :sum_clamped situation))))))
+    (is (= 119 (calculate form :sum situation)))
+    (is (= 118 (calculate form :sum_clamped situation)))))
