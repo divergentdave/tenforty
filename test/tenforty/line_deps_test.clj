@@ -10,10 +10,8 @@
     (dorun (map #(is (contains %) (str %)) deps))))
 
 (let [forms tenforty.forms.ty2015/forms
-      universe (apply merge (vals forms))]
+      universe (:lines forms)]
   (deftest line-deps
-    (dorun (map (fn [entry]
-                  (testing (str "Check that lines are defined for all dependencies in " (key entry))
-                    (dorun (map (partial check-deps universe)
-                                (vals (val entry))))))
-                (seq forms)))))
+    (testing "Check that lines are defined for all dependencies"
+      (dorun (map (partial check-deps universe)
+                  (vals universe))))))

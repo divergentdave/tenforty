@@ -173,4 +173,4 @@
 (defn merge-subgraphs
   [& subgraphs]
   (->FormSubgraph (apply merge (map :lines subgraphs))
-                  (apply merge-with clojure.set/union (map :group subgraphs))))
+                  (apply merge-with clojure.set/union (map :groups subgraphs))))

@@ -2,6 +2,5 @@
   (:use tenforty.core))
 
 (defform
-  [nil]
-  [(make-input-line ::ctc) ; TODO
-])
+  [nil #{}]
+  [(make-input-line ::ctc)]) ; TODO
