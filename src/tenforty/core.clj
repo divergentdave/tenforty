@@ -134,7 +134,7 @@
 (defrecord ZeroTaxSituation []
   GroupValues
   (lookup-value [self kw] 0)
-  (lookup-group [self kw] self))
+  (lookup-group [self kw] [self]))
 
 (defrecord MapTaxSituation [values groups]
   GroupValues
