@@ -99,7 +99,14 @@
   ([kw group expression]
    (list 'tenforty.core/->FormulaLine kw group (list 'fn ['cell-value] expression) (data-dependencies expression))))
 
-(defmacro defform
+(defrecord FormSubgraph [lines groups])
+
+(defn merge-subgraphs
+  [& subgraphs]
+  (->FormSubgraph (apply merge (map :lines subgraphs))
+                  (apply merge-with clojure.set/union (map :groups subgraphs))))
+
+(defmacro make-form-subgraph
   [& args]
   (let [l (gensym "l")
         map_acc (gensym "map_acc")
@@ -125,7 +132,11 @@
              ~groups (apply merge-with clojure.set/union (sorted-map)
                             (map #(sorted-map (first (first %)) (second (first %)))
                                  (partition 2 ~l)))]
-         (def ~'form (->FormSubgraph ~lines ~groups))))))
+         (->FormSubgraph ~lines ~groups)))))
+
+(defmacro defform
+  [& args]
+  `(def ~'form (make-form-subgraph ~@args)))
 
 (defprotocol GroupValues
   (lookup-value [self kw])
@@ -140,13 +151,6 @@
   GroupValues
   (lookup-value [self kw] (kw (:values self)))
   (lookup-group [self kw] (kw (:groups self))))
-
-(defrecord FormSubgraph [lines groups])
-
-(defn merge-subgraphs
-  [& subgraphs]
-  (->FormSubgraph (apply merge (map :lines subgraphs))
-                  (apply merge-with clojure.set/union (map :groups subgraphs))))
 
 (defrecord TenfortyContext [form-subgraph situation group parent-context value-cache child-context-cache])
 
