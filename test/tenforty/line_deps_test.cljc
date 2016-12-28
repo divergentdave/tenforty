@@ -1,6 +1,9 @@
 (ns tenforty.line-deps-test
-  (:require [clojure.test :refer :all]
-            [tenforty.core :refer :all]
+  (:require [clojure.test :refer [deftest
+                                  testing
+                                  is]
+             :include-macros true]
+            [tenforty.core :refer [get-deps]]
             [tenforty.forms.ty2015]))
 
 (defn check-deps
