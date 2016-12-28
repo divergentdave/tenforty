@@ -1,6 +1,24 @@
 (ns tenforty.core-test
-  (:require [clojure.test :refer :all]
-            [tenforty.core :refer :all]))
+  (:require [clojure.test :refer [deftest
+                                  testing
+                                  is]
+             :include-macros true]
+            [tenforty.core :refer [data-dependencies
+                                   defform
+                                   make-form-subgraph
+                                   ->FormSubgraph
+                                   make-input-line
+                                   make-code-input-line
+                                   make-boolean-input-line
+                                   make-formula-line
+                                   get-group
+                                   lookup-value
+                                   lookup-group
+                                   ->ZeroTaxSituation
+                                   ->MapTaxSituation
+                                   calculate
+                                   make-context]
+             :include-macros true]))
 
 (deftest data-deps
   (testing "Get data dependencies from a quoted form"

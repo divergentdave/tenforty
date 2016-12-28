@@ -1,6 +1,14 @@
 (ns tenforty.forms-smoke-test
-  (:require [clojure.test :refer :all]
-            [tenforty.core :refer :all]
+  (:require [clojure.test :refer [deftest
+                                  testing
+                                  is]
+             :include-macros true]
+            [tenforty.core :refer [GroupValues
+                                   lookup-value
+                                   lookup-group
+                                   ->ZeroTaxSituation
+                                   make-context
+                                   calculate]]
             [tenforty.forms.ty2015]))
 
 (defrecord SmokeTestTaxSituation []

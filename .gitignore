@@ -7,5 +7,5 @@ pom.xml.asc
 *.class
 /.lein-*
 /.nrepl-port
-
 /out
+/resources/test/compiled.js

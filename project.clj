@@ -7,9 +7,17 @@
                  [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/math.numeric-tower "0.0.4"]]
   :plugins [[lein-cljsbuild "1.1.5"]]
-  :cljsbuild {:builds [{:source-paths ["src"]
-                        :compiler {:output-dir "out"
-                                   :optimizations :none
-                                   :source-map true
-                                   :pretty-print true}}]}
+  :cljsbuild {:builds {:dev {:source-paths ["src"]
+                             :compiler {:output-to "out/cljs.js"
+                                        :output-dir "out"
+                                        :optimizations :whitespace
+                                        :source-map true
+                                        :pretty-print true}}
+                       :test {:source-paths ["src" "test"]
+                              :compiler {:output-to "resources/test/compiled.js"
+                                         :optimizations :whitespace
+                                         :pretty-print true}}}
+              :test-commands {"unit" ["phantomjs"
+                                      "resources/test/test.js"
+                                      "resources/test/test.html"]}}
   :profiles {:dev {:plugins [[lein-cljfmt "0.5.6"]]}})
