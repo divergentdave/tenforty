@@ -32,6 +32,8 @@
       (is (== 1 ((:fn tax_minus_credits) (fn [kw] -1)))))))
 
 (deftest defform-test
+  (let [form (make-form-subgraph)]
+    (is (= (->FormSubgraph {} {}) form)))
   (defform)
   (is (= (->FormSubgraph {} {}) form))
   (defform
@@ -97,15 +99,15 @@
       (is (= 5 (calculate ctx :a))))))
 
 (deftest calculate-groups-test
-  (defform
-    [nil #{:grp}]
-    [(make-formula-line :clamp 100)
-     (make-formula-line :sum (apply + (cell-value :entry)))
-     (make-formula-line :sum_clamped (apply + (cell-value :clamped)))]
-    [:grp #{}]
-    [(make-input-line :entry)
-     (make-formula-line :clamped (min (cell-value :entry) (cell-value :clamp)))])
-  (let [situation (->MapTaxSituation
+  (let [form (make-form-subgraph
+              [nil #{:grp}]
+              [(make-formula-line :clamp 100)
+               (make-formula-line :sum (apply + (cell-value :entry)))
+               (make-formula-line :sum_clamped (apply + (cell-value :clamped)))]
+              [:grp #{}]
+              [(make-input-line :entry)
+               (make-formula-line :clamped (min (cell-value :entry) (cell-value :clamp)))])
+        situation (->MapTaxSituation
                    {} {:grp [(->MapTaxSituation
                               {:entry 5} {})
                              (->MapTaxSituation
@@ -114,22 +116,22 @@
                               {:entry 101} {})]})]
     (is (= 119 (calculate form :sum situation)))
     (is (= 118 (calculate form :sum_clamped situation))))
-  (defform
-    [nil #{:child}]
-    [(make-formula-line :a (cell-value :b))]
-    [:child #{:grandchild}]
-    []
-    [:granchild #{}]
-    [(make-input-line :b)])
-  (is (thrown? Throwable (calculate form :a (->ZeroTaxSituation))))
-  (defform
-    [nil #{:child}]
-    [(make-formula-line :x (apply + (cell-value :y)))]
-    [:child #{:grandchild}]
-    [(make-formula-line :y (apply + (cell-value :z)))]
-    [:grandchild #{}]
-    [(make-input-line :z)])
-  (let [situation (->MapTaxSituation
+  (let [form (make-form-subgraph
+              [nil #{:child}]
+              [(make-formula-line :a (cell-value :b))]
+              [:child #{:grandchild}]
+              []
+              [:granchild #{}]
+              [(make-input-line :b)])]
+    (is (thrown? Throwable (calculate form :a (->ZeroTaxSituation)))))
+  (let [form (make-form-subgraph
+              [nil #{:child}]
+              [(make-formula-line :x (apply + (cell-value :y)))]
+              [:child #{:grandchild}]
+              [(make-formula-line :y (apply + (cell-value :z)))]
+              [:grandchild #{}]
+              [(make-input-line :z)])
+        situation (->MapTaxSituation
                    {} {:child [(->MapTaxSituation
                                 {} {:grandchild [(->MapTaxSituation
                                                   {:z 1} {})
