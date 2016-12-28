@@ -1,7 +1,12 @@
 (ns tenforty.forms.ty2015.f1040
-  (:require [clojure.math.numeric-tower :refer [ceil]])
-  (:use tenforty.core)
-  (:require tenforty.forms.ty2015.s8812))
+  (:require [tenforty.core :refer [defform
+                                   make-input-line
+                                   make-code-input-line
+                                   make-boolean-input-line
+                                   make-formula-line]
+             :include-macros true]
+            [tenforty.math :refer [ceil]]
+            [tenforty.forms.ty2015.s8812]))
 
 ; Filing status codes
 (def ^:const SINGLE 1)

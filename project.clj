@@ -4,6 +4,7 @@
   :license {:name "GNU GPL v2"
             :url "https://www.gnu.org/licenses/gpl-2.0.en.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
+                 [org.clojure/clojurescript "1.9.293"]
                  [org.clojure/math.numeric-tower "0.0.4"]]
   :plugins [[lein-cljsbuild "1.1.5"]]
   :cljsbuild {:builds [{:source-paths ["src"]
