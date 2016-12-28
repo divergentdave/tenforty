@@ -1,6 +1,6 @@
 (ns tenforty.core
-  (:use clojure.walk)
-  (:require clojure.set))
+  (:require [clojure.walk :refer [postwalk]]
+            [clojure.set]))
 
 (defrecord data-dependency [kw])
 
@@ -173,6 +173,14 @@
         (find-group-parent-contexts group-kw parent-context)
         nil))))
 
+(defn- throw-portable
+  [message]
+  #? (:clj
+      (throw
+       (Exception. message)))
+  #? (:cljs
+      (throw (js/Error. message))))
+
 (declare calculate)
 
 (defn- calculate-context
@@ -191,7 +199,7 @@
           (instance? BooleanInputLine line))
       (let [value (lookup-value (:situation context) kw)]
         (if (nil? value)
-          (throw (Exception. (str "Tax situation has no value for " kw " in group " (:group context))))
+          (throw-portable (str "Tax situation has no value for " kw " in group " (:group context)))
           value)))))
 
 (defn calculate
@@ -211,4 +219,4 @@
                                      (lookup-group (:situation context) group-kw))]
                (swap! (:child-context-cache context) assoc group-kw new-contexts)
                (map #(calculate-context % kw) new-contexts)))
-           (throw (Exception. (str "Line " kw " in group " group-kw " was referenced from group " (:group context) " but " group-kw " is not a direct child of " (:group context))))))))))
+           (throw-portable (str "Line " kw " in group " group-kw " was referenced from group " (:group context) " but " group-kw " is not a direct child of " (:group context)))))))))
