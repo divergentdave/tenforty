@@ -11,7 +11,7 @@
                              :compiler {:output-to "out/cljs.js"
                                         :output-dir "out"
                                         :optimizations :whitespace
-                                        :source-map true
+                                        :source-map "out/cljs.js.map"
                                         :pretty-print true}}
                        :test {:source-paths ["src" "test"]
                               :compiler {:output-to "resources/test/compiled.js"
