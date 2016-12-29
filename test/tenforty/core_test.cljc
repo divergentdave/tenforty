@@ -4,7 +4,6 @@
                                   is]
              :include-macros true]
             [tenforty.core :refer [data-dependencies
-                                   defform
                                    make-form-subgraph
                                    ->FormSubgraph
                                    make-input-line
@@ -49,35 +48,33 @@
       (is (== 0 ((:fn tax_minus_credits) (fn [kw] 1))))
       (is (== 1 ((:fn tax_minus_credits) (fn [kw] -1)))))))
 
-(deftest defform-test
+(deftest make-form-subgraph-test
   (let [form (make-form-subgraph)]
     (is (= (->FormSubgraph {} {}) form)))
-  (defform)
-  (is (= (->FormSubgraph {} {}) form))
-  (defform
-    [nil #{:mygroup}]
-    []
-    [:mygroup #{}]
-    [(make-formula-line ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])
-  (is (= ::refund (:kw (::refund (:lines form)))))
-  (is (= #{::total_payments ::total_tax} (:deps (::refund (:lines form)))))
-  (is (= :mygroup (get-group (::refund (:lines form)))))
-  (is (= {nil #{:mygroup} :mygroup #{}} (:groups form))))
+  (let [form (make-form-subgraph
+              [nil #{:mygroup}]
+              []
+              [:mygroup #{}]
+              [(make-formula-line ::refund (max (- (cell-value ::total_payments) (cell-value ::total_tax)) 0))])]
+    (is (= ::refund (:kw (::refund (:lines form)))))
+    (is (= #{::total_payments ::total_tax} (:deps (::refund (:lines form)))))
+    (is (= :mygroup (get-group (::refund (:lines form)))))
+    (is (= {nil #{:mygroup} :mygroup #{}} (:groups form)))))
 
 (deftest duplicate-line-test
   (is (thrown? #? (:clj IllegalArgumentException :cljs :default)
-               (defform
-                 [nil #{}]
-                 [(make-input-line ::a)
-                  (make-input-line ::a)])))
+               (make-form-subgraph
+                [nil #{}]
+                [(make-input-line ::a)
+                 (make-input-line ::a)])))
   (is (thrown? #? (:clj IllegalArgumentException :cljs :default)
-               (defform
-                 [nil #{:f1 :f2}]
-                 []
-                 [:f1 #{}]
-                 [(make-input-line ::a)]
-                 [:f2 #{}]
-                 [(make-input-line ::a)]))))
+               (make-form-subgraph
+                [nil #{:f1 :f2}]
+                []
+                [:f1 #{}]
+                [(make-input-line ::a)]
+                [:f2 #{}]
+                [(make-input-line ::a)]))))
 
 (deftest zero-tax-situation-test
   (is (= 0 (lookup-value (->ZeroTaxSituation) ::a))))
