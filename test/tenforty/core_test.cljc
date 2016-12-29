@@ -65,12 +65,12 @@
   (is (= {nil #{:mygroup} :mygroup #{}} (:groups form))))
 
 (deftest duplicate-line-test
-  (is (thrown? IllegalArgumentException
+  (is (thrown? #? (:clj IllegalArgumentException :cljs :default)
                (defform
                  [nil #{}]
                  [(make-input-line ::a)
                   (make-input-line ::a)])))
-  (is (thrown? IllegalArgumentException
+  (is (thrown? #? (:clj IllegalArgumentException :cljs :default)
                (defform
                  [nil #{:f1 :f2}]
                  []
@@ -108,7 +108,8 @@
     (is (= true (calculate form :b situation)))
     (is (= 5 (calculate form :c situation)))
     (is (= 10 (calculate form :d situation)))
-    (is (thrown? Throwable (calculate form :e situation)))
+    (is (thrown? #? (:clj Throwable :cljs :default)
+                 (calculate form :e situation)))
     (is (= true (calculate form :true situation)))
     (is (= false (calculate form :false situation)))
     (let [ctx (make-context form situation)]
@@ -141,7 +142,8 @@
               []
               [:granchild #{}]
               [(make-input-line :b)])]
-    (is (thrown? Throwable (calculate form :a (->ZeroTaxSituation)))))
+    (is (thrown? #? (:clj Throwable :cljs :default)
+                 (calculate form :a (->ZeroTaxSituation)))))
   (let [form (make-form-subgraph
               [nil #{:child}]
               [(make-formula-line :x (apply + (cell-value :y)))]

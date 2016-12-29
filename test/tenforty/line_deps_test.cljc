@@ -8,7 +8,7 @@
 
 (defn check-deps
   [universe line]
-  (let [deps (.get-deps line)
+  (let [deps (get-deps line)
         contains (partial contains? universe)]
     (dorun (map #(is (contains %) (str %)) deps))))
 
