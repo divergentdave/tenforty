@@ -20,4 +20,7 @@
               :test-commands {"unit" ["phantomjs"
                                       "resources/test/test.js"
                                       "resources/test/test.html"]}}
+  :clean-targets ^{:protect false} ["out"
+                                   "resources/test/compiled.js"
+                                   :target-path]
   :profiles {:dev {:plugins [[lein-cljfmt "0.5.6"]]}})
