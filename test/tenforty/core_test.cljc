@@ -15,6 +15,7 @@
                                    lookup-group
                                    ->ZeroTaxSituation
                                    ->MapTaxSituation
+                                   ->EdnTaxSituation
                                    calculate
                                    make-context]
              :include-macros true]))
@@ -82,6 +83,21 @@
 (deftest map-tax-situation-test
   (let [situation (->MapTaxSituation {::a 10} {})]
     (is (= 10 (lookup-value situation ::a)))))
+
+(deftest edn-tax-situation-test
+  (let [form (make-form-subgraph
+               [nil #{:g}]
+               [(make-input-line :a)
+                (make-formula-line :b (apply + (cell-value :c)))]
+               [:g #{}]
+               [(make-input-line :c)])
+        situation (->EdnTaxSituation {:values {:a 17}
+                                      :groups {:g [{:values {:c 1}
+                                                    :groups {}}
+                                                   {:values {:c 2}
+                                                    :groups {}}]}})]
+    (is (= 17 (calculate form :a situation)))
+    (is (= 3 (calculate form :b situation)))))
 
 (deftest calculate-test
   (let [form (->FormSubgraph

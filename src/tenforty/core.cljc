@@ -152,6 +152,12 @@
   (lookup-value [self kw] (kw (:values self)))
   (lookup-group [self kw] (kw (:groups self))))
 
+(declare ->EdnTaxSituation)
+(defrecord EdnTaxSituation [object]
+  GroupValues
+  (lookup-value [self kw] (kw (:values (:object self))))
+  (lookup-group [self kw] (map ->EdnTaxSituation (kw (:groups (:object self))))))
+
 (defrecord TenfortyContext [form-subgraph situation group parent-context value-cache child-context-cache])
 
 (defn make-context
