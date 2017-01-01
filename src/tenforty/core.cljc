@@ -50,7 +50,7 @@
   (get-deps [self])
   (get-group [self]))
 
-(defrecord InputLine [kw group]
+(defrecord NumberInputLine [kw group]
   LineMethods
   (get-keyword [self] (:kw self))
   (get-name [self] (name (:kw self)))
@@ -58,9 +58,9 @@
   (get-deps [self] #{})
   (get-group [self] (:group self)))
 
-(defn make-input-line
-  ([kw] (->InputLine kw nil))
-  ([kw group] (->InputLine kw group)))
+(defn make-number-input-line
+  ([kw] (->NumberInputLine kw nil))
+  ([kw group] (->NumberInputLine kw group)))
 
 (defrecord CodeInputLine [kw group]
   LineMethods
@@ -188,7 +188,7 @@
       (throw (js/Error. message))))
 
 (defn input-line? [line]
-  (or (instance? InputLine line)
+  (or (instance? NumberInputLine line)
       (instance? CodeInputLine line)
       (instance? BooleanInputLine line)))
 

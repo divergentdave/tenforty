@@ -6,7 +6,7 @@
             [tenforty.core :refer [data-dependencies
                                    make-form-subgraph
                                    ->FormSubgraph
-                                   make-input-line
+                                   make-number-input-line
                                    make-code-input-line
                                    make-boolean-input-line
                                    make-formula-line
@@ -66,16 +66,16 @@
   (is (thrown? #? (:clj IllegalArgumentException :cljs :default)
                (make-form-subgraph
                 [nil #{}]
-                [(make-input-line ::a)
-                 (make-input-line ::a)])))
+                [(make-number-input-line ::a)
+                 (make-number-input-line ::a)])))
   (is (thrown? #? (:clj IllegalArgumentException :cljs :default)
                (make-form-subgraph
                 [nil #{:f1 :f2}]
                 []
                 [:f1 #{}]
-                [(make-input-line ::a)]
+                [(make-number-input-line ::a)]
                 [:f2 #{}]
-                [(make-input-line ::a)]))))
+                [(make-number-input-line ::a)]))))
 
 (deftest zero-tax-situation-test
   (is (= 0 (lookup-value (->ZeroTaxSituation) ::a))))
@@ -87,10 +87,10 @@
 (deftest edn-tax-situation-test
   (let [form (make-form-subgraph
                [nil #{:g}]
-               [(make-input-line :a)
+               [(make-number-input-line :a)
                 (make-formula-line :b (apply + (cell-value :c)))]
                [:g #{}]
-               [(make-input-line :c)])
+               [(make-number-input-line :c)])
         situation (->EdnTaxSituation {:values {:a 17}
                                       :groups {:g [{:values {:c 1}
                                                     :groups {}}
@@ -105,10 +105,10 @@
                                           (cell-value :c)
                                           (cell-value :d)))
                :b (make-boolean-input-line :b)
-               :c (make-input-line :c)
-               :d (make-input-line :d)
+               :c (make-number-input-line :c)
+               :d (make-number-input-line :d)
                :e (make-formula-line :e (cell-value :z))
-               :z (make-input-line :z)
+               :z (make-number-input-line :z)
                :true (make-boolean-input-line :true)
                :false (make-boolean-input-line :false)}
               {nil #{}})
@@ -137,7 +137,7 @@
                (make-formula-line :sum (apply + (cell-value :entry)))
                (make-formula-line :sum_clamped (apply + (cell-value :clamped)))]
               [:grp #{}]
-              [(make-input-line :entry)
+              [(make-number-input-line :entry)
                (make-formula-line :clamped (min (cell-value :entry) (cell-value :clamp)))])
         situation (->MapTaxSituation
                    {} {:grp [(->MapTaxSituation
@@ -154,7 +154,7 @@
               [:child #{:grandchild}]
               []
               [:granchild #{}]
-              [(make-input-line :b)])]
+              [(make-number-input-line :b)])]
     (is (thrown? #? (:clj Throwable :cljs :default)
                  (calculate form :a (->ZeroTaxSituation)))))
   (let [form (make-form-subgraph
@@ -163,7 +163,7 @@
               [:child #{:grandchild}]
               [(make-formula-line :y (apply + (cell-value :z)))]
               [:grandchild #{}]
-              [(make-input-line :z)])
+              [(make-number-input-line :z)])
         situation (->MapTaxSituation
                    {} {:child [(->MapTaxSituation
                                 {} {:grandchild [(->MapTaxSituation

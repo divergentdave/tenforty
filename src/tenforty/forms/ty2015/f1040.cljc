@@ -1,6 +1,6 @@
 (ns tenforty.forms.ty2015.f1040
   (:require [tenforty.core :refer [defform
-                                   make-input-line
+                                   make-number-input-line
                                    make-code-input-line
                                    make-boolean-input-line
                                    make-formula-line]
@@ -20,19 +20,19 @@
   [(make-code-input-line ::filing_status) ; IRS1040/IndividualReturnFilingStatusCd/text()
    (make-boolean-input-line ::exemption_self)
    (make-boolean-input-line ::exemption_spouse)
-   (make-input-line ::dependents)
+   (make-number-input-line ::dependents)
    (make-formula-line ::exemptions_number (+ (if (cell-value ::exemption_self) 1 0)
                                              (if (cell-value ::exemption_spouse) 1 0)
                                              (cell-value ::dependents)))
 
-   (make-input-line ::wages) ; TODO
-   (make-input-line ::taxable_interest) ; TODO
-   (make-input-line ::tax_exempt_interest) ; TODO
-   (make-input-line ::ordinary_dividends) ; TODO
-   (make-input-line ::qualified_dividends) ; TODO
+   (make-number-input-line ::wages) ; TODO
+   (make-number-input-line ::taxable_interest) ; TODO
+   (make-number-input-line ::tax_exempt_interest) ; TODO
+   (make-number-input-line ::ordinary_dividends) ; TODO
+   (make-number-input-line ::qualified_dividends) ; TODO
 
-   (make-input-line ::last_year_refund)
-   (make-input-line ::last_year_itemized_deductions)
+   (make-number-input-line ::last_year_refund)
+   (make-number-input-line ::last_year_itemized_deductions)
    (make-code-input-line ::last_year_filing_status)
    (make-boolean-input-line ::last_year_senior)
    (make-boolean-input-line ::last_year_spouse_senior)
@@ -58,20 +58,20 @@
                                         SINGLE 1550
                                         HEAD_OF_HOUSEHOLD 1550))) 0))) ; IRS1040/StateLocalIncomeTaxRefundAmt/text()
 
-   (make-input-line ::alimony_received) ; TODO
-   (make-input-line ::business_income_loss) ; TODO
-   (make-input-line ::capital_gain_loss) ; TODO
-   (make-input-line ::other_gain_loss) ; TODO
-   (make-input-line ::ira_distributions) ; TODO
-   (make-input-line ::ira_distributions_taxable) ; TODO
-   (make-input-line ::pensions_annuities) ; TODO
-   (make-input-line ::pensions_annuities_taxable) ; TODO
-   (make-input-line ::schedule_e_income) ; TODO
-   (make-input-line ::farm_income_loss) ; TODO
-   (make-input-line ::unemployment_compensation) ; TODO
-   (make-input-line ::social_security_benefits) ; TODO
-   (make-input-line ::social_security_benefits_taxable) ; TODO
-   (make-input-line ::other_income) ; TODO
+   (make-number-input-line ::alimony_received) ; TODO
+   (make-number-input-line ::business_income_loss) ; TODO
+   (make-number-input-line ::capital_gain_loss) ; TODO
+   (make-number-input-line ::other_gain_loss) ; TODO
+   (make-number-input-line ::ira_distributions) ; TODO
+   (make-number-input-line ::ira_distributions_taxable) ; TODO
+   (make-number-input-line ::pensions_annuities) ; TODO
+   (make-number-input-line ::pensions_annuities_taxable) ; TODO
+   (make-number-input-line ::schedule_e_income) ; TODO
+   (make-number-input-line ::farm_income_loss) ; TODO
+   (make-number-input-line ::unemployment_compensation) ; TODO
+   (make-number-input-line ::social_security_benefits) ; TODO
+   (make-number-input-line ::social_security_benefits_taxable) ; TODO
+   (make-number-input-line ::other_income) ; TODO
 
    (make-formula-line ::magi_total_income (+ (cell-value ::wages)
                                              (cell-value ::taxable_interest)
@@ -89,18 +89,18 @@
    (make-formula-line ::total_income (+ (cell-value ::magi_total_income)
                                         (cell-value ::schedule_e_income)))
 
-   (make-input-line ::educator_expenses) ; TODO
-   (make-input-line ::expenses_2106) ; TODO
-   (make-input-line ::hsa_deduction) ; TODO
-   (make-input-line ::moving_expenses) ; TODO
-   (make-input-line ::self_employment_tax_deductible) ; TODO
-   (make-input-line ::self_employed_pension_deduction) ; TODO
-   (make-input-line ::self_employed_health_insurance_deduction) ; TODO
-   (make-input-line ::early_withdrawl_penalty) ; TODO
-   (make-input-line ::alimony_paid) ; TODO
-   (make-input-line ::ira_deduction) ; TODO
+   (make-number-input-line ::educator_expenses) ; TODO
+   (make-number-input-line ::expenses_2106) ; TODO
+   (make-number-input-line ::hsa_deduction) ; TODO
+   (make-number-input-line ::moving_expenses) ; TODO
+   (make-number-input-line ::self_employment_tax_deductible) ; TODO
+   (make-number-input-line ::self_employed_pension_deduction) ; TODO
+   (make-number-input-line ::self_employed_health_insurance_deduction) ; TODO
+   (make-number-input-line ::early_withdrawl_penalty) ; TODO
+   (make-number-input-line ::alimony_paid) ; TODO
+   (make-number-input-line ::ira_deduction) ; TODO
 
-   (make-input-line ::student_loan_interest)
+   (make-number-input-line ::student_loan_interest)
    (make-formula-line ::student_loan_interest_deduction
                       (let [loans_maxed (min (cell-value ::student_loan_interest) 2500)
                             income_limit (if (= (cell-value ::filing_status)
@@ -117,8 +117,8 @@
                          (- loans_maxed phased_out_loans)
                          0)))
 
-   (make-input-line ::tuition_fees_deduction) ; TODO
-   (make-input-line ::domestic_production_activities_deduction) ; TODO
+   (make-number-input-line ::tuition_fees_deduction) ; TODO
+   (make-number-input-line ::domestic_production_activities_deduction) ; TODO
    (make-formula-line ::agi_deductions (+ (cell-value ::educator_expenses)
                                           (cell-value ::expenses_2106)
                                           (cell-value ::hsa_deduction)
@@ -203,7 +203,7 @@
                                                MARRIED_FILING_JOINTLY 12600
                                                QUALIFYING_WIDOW_WIDOWER 12600
                                                HEAD_OF_HOUSEHOLD 9250)))
-   (make-input-line ::itemized_deductions) ; TODO, schedule A
+   (make-number-input-line ::itemized_deductions) ; TODO, schedule A
    (make-formula-line ::deductions (max (cell-value ::standard_deduction) (cell-value ::itemized_deductions))) ; TODO: "In most cases, your federal income tax will be less if you take the larger of your itemized  deductions  or  standard  deduction." Should this be surfaced as a choice in case the lesser deduction makes more sense?
    (make-formula-line ::agi_minus_deductions (- (cell-value ::agi) (cell-value ::deductions)))
    (make-formula-line ::exemptions_ceiling (condp = (cell-value ::filing_status)
@@ -279,18 +279,18 @@
                                 439000 (+ 115737 (* 0.35 (- (cell-value ::taxable_income) 411500)))
                                 (+ 125362 (* 0.396 (- (cell-value ::taxable_income) 439000))))))
   ; TODO: Form 8814, Form 4972, section 962 election, Form 8863, Form 8621 taxes
-   (make-input-line ::alternative_minimum_tax) ; TODO
-   (make-input-line ::premium_credit_repayment) ; TODO
+   (make-number-input-line ::alternative_minimum_tax) ; TODO
+   (make-number-input-line ::premium_credit_repayment) ; TODO
    (make-formula-line ::pretotal_tax (+ (cell-value ::tax)
                                         (cell-value ::alternative_minimum_tax)
                                         (cell-value ::premium_credit_repayment)))
-   (make-input-line ::foreign_tax_credit) ; TODO
-   (make-input-line ::child_dependent_care_credit) ; TODO
-   (make-input-line ::education_credits) ; TODO
-   (make-input-line ::retirement_savings_contributions_credit) ; TODO
-   (make-input-line ::child_tax_credit) ; TODO
-   (make-input-line ::residential_energy_credits) ; TODO
-   (make-input-line ::other_credits) ; TODO
+   (make-number-input-line ::foreign_tax_credit) ; TODO
+   (make-number-input-line ::child_dependent_care_credit) ; TODO
+   (make-number-input-line ::education_credits) ; TODO
+   (make-number-input-line ::retirement_savings_contributions_credit) ; TODO
+   (make-number-input-line ::child_tax_credit) ; TODO
+   (make-number-input-line ::residential_energy_credits) ; TODO
+   (make-number-input-line ::other_credits) ; TODO
    (make-formula-line ::total_credits (+ (cell-value ::foreign_tax_credit)
                                          (cell-value ::child_dependent_care_credit)
                                          (cell-value ::education_credits)
@@ -300,13 +300,13 @@
                                          (cell-value ::other_credits)))
    (make-formula-line ::tax_minus_credits (max (- (cell-value ::pretotal_tax) (cell-value ::total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0))
 
-   (make-input-line ::self_employment_tax) ; TODO
-   (make-input-line ::unreported_social_security_medicare_tax) ; TODO
-   (make-input-line ::additional_tax_retirement_plans) ; TODO
-   (make-input-line ::household_employment_taxes) ; TODO
-   (make-input-line ::first_time_homebuyer_credit_repayment) ; TODO
-   (make-input-line ::health_care_individual_responsibility) ; TODO
-   (make-input-line ::other_taxes) ; TODO
+   (make-number-input-line ::self_employment_tax) ; TODO
+   (make-number-input-line ::unreported_social_security_medicare_tax) ; TODO
+   (make-number-input-line ::additional_tax_retirement_plans) ; TODO
+   (make-number-input-line ::household_employment_taxes) ; TODO
+   (make-number-input-line ::first_time_homebuyer_credit_repayment) ; TODO
+   (make-number-input-line ::health_care_individual_responsibility) ; TODO
+   (make-number-input-line ::other_taxes) ; TODO
    (make-formula-line ::total_tax (+ (cell-value ::tax_minus_credits)
                                      (cell-value ::self_employment_tax)
                                      (cell-value ::unreported_social_security_medicare_tax)
@@ -316,16 +316,16 @@
                                      (cell-value ::health_care_individual_responsibility)
                                      (cell-value ::other_taxes)))
 
-   (make-input-line ::federal_tax_withheld)
-   (make-input-line ::estimated_tax_payments)
-   (make-input-line ::earned_income_credit)
-   (make-input-line ::additional_child_tax_credit)
-   (make-input-line ::american_opportunity_credit)
-   (make-input-line ::net_premium_tax_credit)
-   (make-input-line ::payment_with_extension_request)
-   (make-input-line ::excess_social_security_withheld)
-   (make-input-line ::federal_fuel_tax_credit)
-   (make-input-line ::other_credits_payments)
+   (make-number-input-line ::federal_tax_withheld)
+   (make-number-input-line ::estimated_tax_payments)
+   (make-number-input-line ::earned_income_credit)
+   (make-number-input-line ::additional_child_tax_credit)
+   (make-number-input-line ::american_opportunity_credit)
+   (make-number-input-line ::net_premium_tax_credit)
+   (make-number-input-line ::payment_with_extension_request)
+   (make-number-input-line ::excess_social_security_withheld)
+   (make-number-input-line ::federal_fuel_tax_credit)
+   (make-number-input-line ::other_credits_payments)
    (make-formula-line ::total_payments (+ (cell-value ::federal_tax_withheld)
                                           (cell-value ::estimated_tax_payments)
                                           (cell-value ::earned_income_credit)
