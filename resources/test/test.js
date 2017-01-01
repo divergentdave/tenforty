@@ -12,6 +12,15 @@ phantom.onError = function(msg, trace) {
 
 var page = require("webpage").create();
 
+function exit(code) {
+    if (page) {
+        page.close();
+    }
+    setTimeout(function() {
+        phantom.exit(code);
+    }, 0);
+}
+
 page.onError = function(msg, trace) {
     var msgStack = ['ERROR: ' + msg];
     if (trace && trace.length) {
@@ -21,20 +30,12 @@ page.onError = function(msg, trace) {
         });
     }
     console.log(msgStack.join('\n'));
+    exit(1);
 };
 
 page.onConsoleMessage = function(msg) {
     console.log(msg);
 };
-
-function exit(code) {
-    if (page) {
-        page.close();
-    }
-    setTimeout(function() {
-        phantom.exit(code);
-    }, 0);
-}
 
 page.onCallback = function(successful) {
     if (successful) {
