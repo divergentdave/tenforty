@@ -187,6 +187,11 @@
   #? (:cljs
       (throw (js/Error. message))))
 
+(defn input-line? [line]
+  (or (instance? InputLine line)
+      (instance? CodeInputLine line)
+      (instance? BooleanInputLine line)))
+
 (declare calculate)
 
 (defn- calculate-context
@@ -200,9 +205,7 @@
         (let [retval (eval-line line #(calculate context %))]
           (swap! (:value-cache context) assoc kw retval)
           retval))
-      (or (instance? InputLine line)
-          (instance? CodeInputLine line)
-          (instance? BooleanInputLine line))
+      (input-line? line)
       (let [value (lookup-value (:situation context) kw)]
         (if (nil? value)
           (throw-portable (str "Tax situation has no value for " kw " in group " (:group context)))
