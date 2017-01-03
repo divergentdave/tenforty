@@ -17,7 +17,8 @@
                                    ->MapTaxSituation
                                    ->EdnTaxSituation
                                    calculate
-                                   make-context]
+                                   make-context
+                                   reverse-deps]
              :include-macros true]))
 
 (deftest data-deps
@@ -176,3 +177,14 @@
                                                  (->MapTaxSituation
                                                   {:z 4} {})]})]})]
     (is (= 10 (calculate form :x situation)))))
+
+(deftest reverse-deps-test
+  (let [form (make-form-subgraph
+              [nil #{}]
+              [(make-number-input-line :a)
+               (make-formula-line :b (cell-value :a))
+               (make-formula-line :c (+ (cell-value :a) (cell-value :b)))])]
+    (is (= {:a #{:b :c}
+            :b #{:c}
+            :c #{}}
+           (reverse-deps form)))))

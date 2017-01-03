@@ -229,3 +229,14 @@
                (swap! (:child-context-cache context) assoc group-kw new-contexts)
                (map #(calculate-context % kw) new-contexts)))
            (throw-portable (str "Line " kw " in group " group-kw " was referenced from group " (:group context) " but " group-kw " is not a direct child of " (:group context)))))))))
+
+(defn reverse-deps [form-subgraph]
+  (let [lines (:lines form-subgraph)
+        line-kws (keys lines)]
+    (apply merge-with clojure.set/union
+           (zipmap line-kws (repeat #{}))
+           (map
+            (fn [line-kw]
+              (let [deps (seq (get-deps (line-kw lines)))]
+                (apply merge-with clojure.set/union (map #(sorted-map % #{line-kw}) deps))))
+            line-kws))))
