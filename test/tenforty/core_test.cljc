@@ -87,11 +87,11 @@
 
 (deftest edn-tax-situation-test
   (let [form (make-form-subgraph
-               [nil #{:g}]
-               [(make-number-input-line :a)
-                (make-formula-line :b (apply + (cell-value :c)))]
-               [:g #{}]
-               [(make-number-input-line :c)])
+              [nil #{:g}]
+              [(make-number-input-line :a)
+               (make-formula-line :b (apply + (cell-value :c)))]
+              [:g #{}]
+              [(make-number-input-line :c)])
         situation (->EdnTaxSituation {:values {:a 17}
                                       :groups {:g [{:values {:c 1}
                                                     :groups {}}
