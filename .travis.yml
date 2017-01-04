@@ -4,4 +4,6 @@ install: lein with-profile +dev deps
 script:
   - lein with-profile +dev cljfmt check
   - lein test
+  - lein cljsbuild once dev
+  - lein cljsbuild once test
   - lein cljsbuild test
