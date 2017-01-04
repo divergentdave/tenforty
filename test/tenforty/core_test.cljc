@@ -183,8 +183,10 @@
               [nil #{}]
               [(make-number-input-line :a)
                (make-formula-line :b (cell-value :a))
-               (make-formula-line :c (+ (cell-value :a) (cell-value :b)))])]
-    (is (= {:a #{:b :c}
-            :b #{:c}
-            :c #{}}
+               (make-formula-line :c (+ (cell-value :a) (cell-value :b)))
+               (make-formula-line :d (cell-value :c))])]
+    (is (= {:a #{:b :c :d}
+            :b #{:c :d}
+            :c #{:d}
+            :d #{}}
            (reverse-deps form)))))

@@ -230,6 +230,11 @@
                (map #(calculate-context % kw) new-contexts)))
            (throw-portable (str "Line " kw " in group " group-kw " was referenced from group " (:group context) " but " group-kw " is not a direct child of " (:group context)))))))))
 
+(defn- recursive-deps
+  [lines kw]
+  (let [deps (get-deps (kw lines))]
+    (apply clojure.set/union deps (map (partial recursive-deps lines) deps))))
+
 (defn reverse-deps [form-subgraph]
   (let [lines (:lines form-subgraph)
         line-kws (keys lines)]
@@ -237,6 +242,6 @@
            (zipmap line-kws (repeat #{}))
            (map
             (fn [line-kw]
-              (let [deps (seq (get-deps (line-kw lines)))]
+              (let [deps (seq (recursive-deps lines line-kw))]
                 (apply merge-with clojure.set/union (map #(sorted-map % #{line-kw}) deps))))
             line-kws))))
