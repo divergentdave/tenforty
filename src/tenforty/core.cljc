@@ -62,7 +62,7 @@
   ([kw] (->NumberInputLine kw nil))
   ([kw group] (->NumberInputLine kw group)))
 
-(defrecord CodeInputLine [kw group]
+(defrecord CodeInputLine [kw options group]
   LineMethods
   (get-keyword [self] (:kw self))
   (get-name [self] (name (:kw self)))
@@ -71,8 +71,8 @@
   (get-group [self] (:group self)))
 
 (defn make-code-input-line
-  ([kw] (->CodeInputLine kw nil))
-  ([kw group] (->CodeInputLine kw group)))
+  ([kw options] (->CodeInputLine kw options nil))
+  ([kw options group] (->CodeInputLine kw options group)))
 
 (defrecord BooleanInputLine [kw group]
   LineMethods

@@ -14,10 +14,15 @@
 (def ^:const MARRIED_FILING_SEPARATELY 3)
 (def ^:const HEAD_OF_HOUSEHOLD 4)
 (def ^:const QUALIFYING_WIDOW_WIDOWER 5)
+(def ^:const FILING_STATUSES {"Single" SINGLE
+                              "Married filing jointly" MARRIED_FILING_JOINTLY
+                              "Married filing separately" MARRIED_FILING_SEPARATELY
+                              "Head of household" HEAD_OF_HOUSEHOLD
+                              "Qualifying widow(er)" QUALIFYING_WIDOW_WIDOWER})
 
 (defform
   [nil #{}]
-  [(make-code-input-line ::filing_status) ; IRS1040/IndividualReturnFilingStatusCd/text()
+  [(make-code-input-line ::filing_status FILING_STATUSES) ; IRS1040/IndividualReturnFilingStatusCd/text()
    (make-boolean-input-line ::exemption_self)
    (make-boolean-input-line ::exemption_spouse)
    (make-number-input-line ::dependents)
@@ -33,7 +38,7 @@
 
    (make-number-input-line ::last_year_refund)
    (make-number-input-line ::last_year_itemized_deductions)
-   (make-code-input-line ::last_year_filing_status)
+   (make-code-input-line ::last_year_filing_status FILING_STATUSES)
    (make-boolean-input-line ::last_year_senior)
    (make-boolean-input-line ::last_year_spouse_senior)
    (make-boolean-input-line ::last_year_blind)
