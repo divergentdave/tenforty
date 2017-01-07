@@ -79,7 +79,8 @@
   (get-keyword [self] (:kw self))
   (get-name [self] (name (:kw self)))
   (eval-line [self cell-value] (cell-value (:kw self)))
-  (get-deps [self] #{}))
+  (get-deps [self] #{})
+  (get-group [self] (:group self)))
 
 (defn make-boolean-input-line
   ([kw] (->BooleanInputLine kw nil))
