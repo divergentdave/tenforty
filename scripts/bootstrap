@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# This script will create an "irs" directory inside the current working
+# directory, check out the three related repositories in subdirectories of
+# "irs", and perform other one-time development environment setup tasks.
+# (setting up checkouts symlinks, an initial install into the Maven local
+# repository, and setting up git pre-commit hook symlinks)
+
+set -e
+
+echo "Checking for Leiningen"
+lein -v || (echo; echo "Please install Leiningen first. Instructions are available for most operating"; echo "systems at https://leiningen.org/#install."; exit 1)
+echo
+
+mkdir irs
+git clone https://github.com/divergentdave/tenforty.git irs/tenforty
+git clone https://github.com/divergentdave/tenforty.tools.git irs/tenforty.tools
+git clone https://github.com/divergentdave/tenforty.webapp.git irs/tenforty.webapp
+
+mkdir irs/tenforty.tools/checkouts
+ln -s ../../tenforty irs/tenforty.tools/checkouts/tenforty
+mkdir irs/tenforty.webapp/checkouts
+ln -s ../../tenforty irs/tenforty.webapp/checkouts/tenforty
+
+(cd irs/tenforty && lein install)
+(cd irs/tenforty.tools && lein install)
+(cd irs/tenforty.webapp && lein install)
+
+ln -s ../../scripts/pre-commit irs/tenforty/.git/hooks/pre-commit
+ln -s ../../scripts/pre-commit irs/tenforty.tools/.git/hooks/pre-commit
+ln -s ../../scripts/pre-commit irs/tenforty.webapp/.git/hooks/pre-commit
+
+echo
+echo "All done! Now cd into irs/tenforty, irs/tenforty.tools, or irs/tenforty.webapp,"
+echo "and start hacking."
+echo
+echo "Common commands:"
+echo " - lein test"
+echo "     Run Clojure test suite"
+echo " - lein cljsbuild test"
+echo "     Run ClojureScript test suite"
+echo " - lein cljsbuild once"
+echo "     Compile ClojureScript to JavaScript"
+echo "     (Open resources/public/index.html in a browser to run it)"
+echo " - lein cljsbuild auto"
+echo "     Watch for changes and compile ClojureScript to JavaScript automatically"
+echo " - lein repl"
+echo "     Start a REPL with access to the current directory's project"
+echo " - lein run"
+echo "     Run Clojure application"
