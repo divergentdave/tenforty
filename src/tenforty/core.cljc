@@ -171,9 +171,7 @@
 
 (defn- find-group-parent-contexts
   [group-kw context]
-  (let [;line (line-kw (:lines (:form-subgraph context)))
-        ;group-kw (:group line)
-        parent-context (:parent-context context)]
+  (let [parent-context (:parent-context context)]
     (if (= group-kw (:group context))
       context
       (if parent-context
