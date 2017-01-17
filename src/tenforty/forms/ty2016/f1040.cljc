@@ -30,7 +30,20 @@
                          (if (cell-value ::exemption_spouse) 1 0)
                          (cell-value ::dependents)))
 
-   (make-number-input-line ::wages) ; TODO
+   (make-number-input-line ::wages_household_employee)
+   (make-number-input-line ::unreported_tips)
+   (make-number-input-line ::scholarships_fellowships)
+   (make-formula-line ::wages
+                      (+ (cell-value ::wages_household_employee)
+                         (cell-value ::unreported_tips)
+                         (cell-value :tenforty.forms.ty2016.f2441/taxable_benefits)
+                         ; TODO: Employer-provided adoption benefits, code T, see Form 8839
+                         (cell-value ::scholarships_fellowships)
+                         ; TODO: Excess salary deferrals
+                         ; TODO: Form 1099-R
+                         ; TODO: Form 8919, line 6
+                         (apply + (cell-value :tenforty.forms.ty2016.w2/wages_tips_other))))
+
    (make-number-input-line ::taxable_interest) ; TODO
    (make-number-input-line ::tax_exempt_interest) ; TODO
    (make-number-input-line ::ordinary_dividends) ; TODO
@@ -302,7 +315,6 @@
                                         (cell-value ::alternative_minimum_tax)
                                         (cell-value ::premium_credit_repayment)))
    (make-number-input-line ::foreign_tax_credit) ; TODO
-   (make-number-input-line ::child_dependent_care_credit) ; TODO
    (make-number-input-line ::education_credits) ; TODO
    (make-number-input-line ::retirement_savings_contributions_credit) ; TODO
    (make-number-input-line ::child_tax_credit) ; TODO
@@ -310,7 +322,7 @@
    (make-number-input-line ::other_credits) ; TODO
    (make-formula-line ::total_credits
                       (+ (cell-value ::foreign_tax_credit)
-                         (cell-value ::child_dependent_care_credit)
+                         (cell-value :tenforty.forms.ty2016.f2441/child_dependent_care_expenses_credit)
                          (cell-value ::education_credits)
                          (cell-value ::retirement_savings_contributions_credit)
                          (cell-value ::child_tax_credit)
