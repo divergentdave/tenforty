@@ -69,9 +69,13 @@
                            0))
 
    (make-formula-line ::line_29
-                      (max (- (if (>= (cell-value ::qualifying_persons_number) 2)
+                      (max (- (cond
+                                (>= (cell-value ::qualifying_persons_number) 2)
                                 6000
-                                3000)
+                                (= (cell-value ::qualifying_persons_number) 1)
+                                3000
+                                true
+                                0)
                               (+ (cell-value ::deductible_benefits)
                                  (cell-value ::excluded_benefits)))
                            0))
