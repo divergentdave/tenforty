@@ -6,34 +6,35 @@
             [tenforty.core :refer [GroupValues
                                    lookup-value
                                    lookup-group
-                                   ->ZeroTaxSituation
                                    make-context
-                                   calculate]]
+                                   calculate
+                                   #?@(:cljs
+                                       [BooleanInputLine
+                                        CodeInputLine
+                                        NumberInputLine])]]
             [tenforty.forms.ty2015]
-            [tenforty.forms.ty2016]))
+            [tenforty.forms.ty2016])
+  #?(:clj (:import [tenforty.core
+                    BooleanInputLine
+                    CodeInputLine
+                    NumberInputLine])))
 
-(defrecord SmokeTestTaxSituation []
+(defrecord SmokeTestTaxSituation [forms]
   GroupValues
   (lookup-value [self kw]
-    (condp = kw
-      :tenforty.forms.ty2015.f1040/filing_status 1
-      :tenforty.forms.ty2015.f1040/last_year_filing_status 1
-      :tenforty.forms.ty2015.f1040/senior false
-      :tenforty.forms.ty2015.f1040/spouse_senior false
-      :tenforty.forms.ty2015.f1040/blind false
-      :tenforty.forms.ty2015.f1040/spouse_blind false
-      :tenforty.forms.ty2016.f1040/filing_status 1
-      :tenforty.forms.ty2016.f1040/last_year_filing_status 1
-      :tenforty.forms.ty2016.f1040/senior false
-      :tenforty.forms.ty2016.f1040/spouse_senior false
-      :tenforty.forms.ty2016.f1040/blind false
-      :tenforty.forms.ty2016.f1040/spouse_blind false
-      0))
+    (let [line (get (:lines (:forms self)) kw)]
+      (cond
+        (instance? BooleanInputLine line)
+        false
+        (instance? CodeInputLine line)
+        (first (vals (:options line)))
+        (instance? NumberInputLine line)
+        0)))
   (lookup-group [self kw]
-    [(->ZeroTaxSituation)]))
+    [self]))
 
 (deftest form-line-smoke-test-2015
-  (let [situation (->SmokeTestTaxSituation)
+  (let [situation (->SmokeTestTaxSituation tenforty.forms.ty2015/forms)
         context (make-context tenforty.forms.ty2015/forms situation)
         lines (vals (:lines tenforty.forms.ty2015/forms))]
     (dorun (map (fn [line]
@@ -43,7 +44,7 @@
                 lines))))
 
 (deftest form-line-smoke-test-2016
-  (let [situation (->SmokeTestTaxSituation)
+  (let [situation (->SmokeTestTaxSituation tenforty.forms.ty2016/forms)
         context (make-context tenforty.forms.ty2016/forms situation)
         lines (vals (:lines tenforty.forms.ty2016/forms))]
     (dorun (map (fn [line]
