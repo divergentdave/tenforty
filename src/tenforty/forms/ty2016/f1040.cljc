@@ -49,7 +49,7 @@
    (make-number-input-line ::ordinary_dividends) ; TODO
    (make-number-input-line ::qualified_dividends) ; TODO
 
-   (make-number-input-line ::last_year_refund)
+   (make-number-input-line ::last_year_state_local_refund)
    (make-number-input-line ::last_year_itemized_deductions)
    (make-code-input-line ::last_year_filing_status FILING_STATUSES)
    (make-boolean-input-line ::last_year_senior)
@@ -57,7 +57,7 @@
    (make-boolean-input-line ::last_year_blind)
    (make-boolean-input-line ::last_year_spouse_blind)
    (make-formula-line ::taxable_tax_refunds ; TODO: The instructions are full of exceptions that aren't captured here yet, see publication 525 for complete details
-                      (min (cell-value ::last_year_refund)
+                      (min (cell-value ::last_year_state_local_refund)
                            (max (- (cell-value ::last_year_itemized_deductions)
                                    (condp = (cell-value ::last_year_filing_status)
                                      SINGLE 6300
