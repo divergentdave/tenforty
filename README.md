@@ -4,13 +4,13 @@ A library to assist in analyzing the US tax system.
 
 ## Usage
 
-This library provides infrastructure to perform tax calculations. It is still under early development, and is being developed alongside two other Clojure projects that use it, [tenforty.tools](https://github.com/divergentdave/tenforty.tools) and [tenforty.webapp](https://github.com/divergentdave/tenforty.webapp).
+This library provides infrastructure to perform tax calculations. It is still under early development, and is being developed alongside two other Clojure projects that use it, [tenforty.tools](https://github.com/divergentdave/tenforty.tools), which contains command-line utilities, and [tenforty.webapp](https://github.com/divergentdave/tenforty.webapp), which does tax calculations in the browser.
 
 ## Installation
 
 `tenforty` requires a working Java runtime and a Clojure runtime (by way of [Leiningen](https://leiningen.org/)). If your computer does not yet have Java, install it from your operating system's package manager or from https://java.com/. Next, install Leiningen according to the [installation instructions](https://leiningen.org/#install) for your operating system.
 
-Once you have installed these dependencies, you can either check out this repository manually, or run the command below to check out all three `tenforty` projects and perform other development environment setup.
+Once you have installed these dependencies, you can either check out this repository manually, or run the command below to check out all three `tenforty`-related projects and perform other development environment setup.
 
 ```
 curl -o- https://raw.githubusercontent.com/divergentdave/tenforty/master/scripts/bootstrap | bash
