@@ -44,7 +44,7 @@
                          (cell-value ::additional_medicare_tax_on_self_employment_income)
                          (cell-value ::additional_medicare_tax_on_rrta_compensation)))
    (make-formula-line ::total_additional_medicare_tax_withholding
-     (+ (max (- (apply + (cell-value :tenforty.forms.ty2016.w2/medicare_tax_withheld))
-                (* 0.0145 (apply + (cell-value :tenforty.forms.ty2016.w2/medicare_wages_tips))))
-                0)
-        (cell-value ::rrta_additional_medicare_tax_withholding)))])
+                      (+ (max (- (apply + (cell-value :tenforty.forms.ty2016.w2/medicare_tax_withheld))
+                                 (* 0.0145 (apply + (cell-value :tenforty.forms.ty2016.w2/medicare_wages_tips))))
+                              0)
+                         (cell-value ::rrta_additional_medicare_tax_withholding)))])
