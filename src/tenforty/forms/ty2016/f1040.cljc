@@ -340,8 +340,8 @@
 
    (make-number-input-line ::self_employment_tax) ; TODO
    (make-formula-line ::unreported_social_security_medicare_tax
-                      (+ (cell-value :tenforty.forms.ty2016.f4137/unreported_social_security_medicare_tax)
-                         (cell-value :tenforty.forms.ty2016.f8919/unreported_social_security_medicare_tax)))
+                      (+ (apply + (cell-value :tenforty.forms.ty2016.f4137/unreported_social_security_medicare_tax))
+                         (apply + (cell-value :tenforty.forms.ty2016.f8919/unreported_social_security_medicare_tax))))
    (make-number-input-line ::additional_tax_retirement_plans) ; TODO
    (make-number-input-line ::household_employment_taxes) ; TODO
    (make-number-input-line ::first_time_homebuyer_credit_repayment) ; TODO

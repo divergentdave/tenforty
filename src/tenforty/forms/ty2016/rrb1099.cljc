@@ -6,7 +6,7 @@
 
 (defform
   [nil #{:rrb1099}]
-  []
+  [(make-formula-line ::total_gross_paid_total (apply + (cell-value ::total_gross_paid)))]
   [:rrb1099 #{}]
   [(make-number-input-line ::employee_contributions)
    (make-number-input-line ::contributory_amount_paid)

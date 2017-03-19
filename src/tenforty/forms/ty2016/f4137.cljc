@@ -6,7 +6,8 @@
 
 (defform
   [nil #{:f4137}]
-  []
+  [(make-formula-line ::social_security_unreported_tips_total
+                      (apply + (cell-value ::social_security_unreported_tips)))]
   [:f4137 #{:f4137_employer}]
   [(make-formula-line ::actual_tips_total (apply + (cell-value ::actual_tips)))
    (make-formula-line ::reported_tips_total (apply + (cell-value ::reported_tips)))
@@ -20,9 +21,9 @@
    (make-formula-line ::social_security_unreported_tips
                       (min (cell-value ::medicare_unreported_tips)
                            (max (- 118500
-                                   (+ (apply + (cell-value :tenforty.forms.ty2016.w2/social_security_wages))
-                                      (apply + (cell-value :tenforty.forms.ty2016.w2/social_security_tips))
-                                      (min 118500 (apply + (cell-value :tenforty.forms.ty2016.rrb1099/total_gross_paid)))))
+                                   (+ (cell-value :tenforty.forms.ty2016.w2/social_security_wages_total)
+                                      (cell-value :tenforty.forms.ty2016.w2/social_security_tips_total)
+                                      (min 118500 (cell-value :tenforty.forms.ty2016.rrb1099/total_gross_paid_total))))
                                 0)))
    (make-formula-line ::unreported_social_security_medicare_tax
                       (+ (* 0.062 (cell-value ::social_security_unreported_tips))
