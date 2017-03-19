@@ -2,8 +2,8 @@
   (:require [tenforty.core :refer [defform
                                    make-number-input-line
                                    make-formula-line]
-             :include-macros true])
-  (:require [tenforty.forms.ty2016.f1040 :refer [SINGLE
+             :include-macros true]
+            [tenforty.forms.ty2016.f1040 :refer [SINGLE
                                                  MARRIED_FILING_JOINTLY
                                                  MARRIED_FILING_SEPARATELY
                                                  HEAD_OF_HOUSEHOLD
