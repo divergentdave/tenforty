@@ -216,7 +216,9 @@
   ([form-subgraph kw situation group]
    (calculate (make-context form-subgraph situation group) kw))
   ([context kw]
-   (let [group-kw (:group (kw (:lines (:form-subgraph context))))]
+   (let [group-kw (:group (kw (:lines (:form-subgraph context))))
+         group-name (if (nil? group-kw) "nil" (str group-kw))
+         context-group-name (if (nil? (:group context)) "nil" (str (:group context)))]
      (if-let [parent-or-self-context (find-group-parent-contexts group-kw context)]
        (calculate-context parent-or-self-context kw)
        (let [child-group-kws (get (:groups (:form-subgraph context)) (:group context))]
@@ -227,7 +229,7 @@
                                      (lookup-group (:situation context) group-kw))]
                (swap! (:child-context-cache context) assoc group-kw new-contexts)
                (map #(calculate-context % kw) new-contexts)))
-           (throw-portable (str "Line " kw " in group " group-kw " was referenced from group " (:group context) " but " group-kw " is not a direct child of " (:group context)))))))))
+           (throw-portable (str "Line " kw " in group " group-name " was referenced from group " context-group-name " but " group-name " is not a direct child of " context-group-name))))))))
 
 (defn- recursive-deps
   [lines kw]

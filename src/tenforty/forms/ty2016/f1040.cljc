@@ -31,17 +31,16 @@
                          (cell-value ::dependents)))
 
    (make-number-input-line ::wages_household_employee)
-   (make-number-input-line ::unreported_tips)
    (make-number-input-line ::scholarships_fellowships)
    (make-formula-line ::wages
                       (+ (cell-value ::wages_household_employee)
-                         (cell-value ::unreported_tips)
+                         (apply + (cell-value :tenforty.forms.ty2016.f4137/unreported_tips))
                          (cell-value :tenforty.forms.ty2016.f2441/taxable_benefits)
                          ; TODO: Employer-provided adoption benefits, code T, see Form 8839
                          (cell-value ::scholarships_fellowships)
                          ; TODO: Excess salary deferrals
-                         ; TODO: Form 1099-R
-                         ; TODO: Form 8919, line 6
+                         (apply + (cell-value :tenforty.forms.ty2016.f1099r/taxable_amount))
+                         (apply + (cell-value :tenforty.forms.ty2016.f8919/wages_without_withholding_total))
                          (apply + (cell-value :tenforty.forms.ty2016.w2/wages_tips_other))))
 
    (make-number-input-line ::taxable_interest) ; TODO
@@ -49,6 +48,8 @@
    (make-number-input-line ::ordinary_dividends) ; TODO
    (make-number-input-line ::qualified_dividends) ; TODO
 
+   (make-boolean-input-line ::last_year_did_itemize_deductions)
+   (make-boolean-input-line ::last_year_did_deduct_state_local_income_tax)
    (make-number-input-line ::last_year_state_local_refund)
    (make-number-input-line ::last_year_itemized_deductions)
    (make-code-input-line ::last_year_filing_status FILING_STATUSES)
@@ -57,25 +58,28 @@
    (make-boolean-input-line ::last_year_blind)
    (make-boolean-input-line ::last_year_spouse_blind)
    (make-formula-line ::taxable_tax_refunds ; TODO: The instructions are full of exceptions that aren't captured here yet, see publication 525 for complete details
-                      (min (cell-value ::last_year_state_local_refund)
-                           (max (- (cell-value ::last_year_itemized_deductions)
-                                   (condp = (cell-value ::last_year_filing_status)
-                                     SINGLE 6300
-                                     MARRIED_FILING_SEPARATELY 6300
-                                     MARRIED_FILING_JOINTLY 12600
-                                     QUALIFYING_WIDOW_WIDOWER 12600
-                                     HEAD_OF_HOUSEHOLD 9250)
-                                   (* (+ (if (cell-value ::last_year_senior) 1 0)
-                                         (if (cell-value ::last_year_spouse_senior) 1 0)
-                                         (if (cell-value ::last_year_blind) 1 0)
-                                         (if (cell-value ::last_year_spouse_blind) 1 0))
-                                      (condp = (cell-value ::last_year_filing_status)
-                                        MARRIED_FILING_SEPARATELY 1250
-                                        MARRIED_FILING_JOINTLY 1250
-                                        QUALIFYING_WIDOW_WIDOWER 1250
-                                        SINGLE 1550
-                                        HEAD_OF_HOUSEHOLD 1550)))
-                                0)))
+                      (if (and (cell-value ::last_year_did_itemize_deductions)
+                               (cell-value ::last_year_did_deduct_state_local_income_tax))
+                        (min (cell-value ::last_year_state_local_refund)
+                             (max (- (cell-value ::last_year_itemized_deductions)
+                                     (condp = (cell-value ::last_year_filing_status)
+                                       SINGLE 6300
+                                       MARRIED_FILING_SEPARATELY 6300
+                                       MARRIED_FILING_JOINTLY 12600
+                                       QUALIFYING_WIDOW_WIDOWER 12600
+                                       HEAD_OF_HOUSEHOLD 9250)
+                                     (* (+ (if (cell-value ::last_year_senior) 1 0)
+                                           (if (cell-value ::last_year_spouse_senior) 1 0)
+                                           (if (cell-value ::last_year_blind) 1 0)
+                                           (if (cell-value ::last_year_spouse_blind) 1 0))
+                                        (condp = (cell-value ::last_year_filing_status)
+                                          MARRIED_FILING_SEPARATELY 1250
+                                          MARRIED_FILING_JOINTLY 1250
+                                          QUALIFYING_WIDOW_WIDOWER 1250
+                                          SINGLE 1550
+                                          HEAD_OF_HOUSEHOLD 1550)))
+                                  0))
+                        0))
 
    (make-number-input-line ::alimony_received) ; TODO
    (make-number-input-line ::business_income_loss) ; TODO
@@ -335,12 +339,14 @@
                            0))
 
    (make-number-input-line ::self_employment_tax) ; TODO
-   (make-number-input-line ::unreported_social_security_medicare_tax) ; TODO
+   (make-formula-line ::unreported_social_security_medicare_tax
+                      (+ (apply + (cell-value :tenforty.forms.ty2016.f4137/unreported_social_security_medicare_tax))
+                         (apply + (cell-value :tenforty.forms.ty2016.f8919/unreported_social_security_medicare_tax))))
    (make-number-input-line ::additional_tax_retirement_plans) ; TODO
    (make-number-input-line ::household_employment_taxes) ; TODO
    (make-number-input-line ::first_time_homebuyer_credit_repayment) ; TODO
    (make-number-input-line ::health_care_individual_responsibility) ; TODO
-   (make-number-input-line ::other_taxes) ; TODO
+   (make-number-input-line ::other_taxes) ; TODO, 8960 and "instructions"
    (make-formula-line ::total_tax
                       (+ (cell-value ::tax_minus_credits)
                          (cell-value ::self_employment_tax)
@@ -349,9 +355,16 @@
                          (cell-value ::household_employment_taxes)
                          (cell-value ::first_time_homebuyer_credit_repayment)
                          (cell-value ::health_care_individual_responsibility)
+                         (cell-value :tenforty.forms.ty2016.f8959/additional_medicare_tax)
                          (cell-value ::other_taxes)))
 
-   (make-number-input-line ::federal_tax_withheld)
+   (make-formula-line ::federal_tax_withheld
+                      (+ (apply + (cell-value :tenforty.forms.ty2016.w2/federal_income_tax_withheld))
+                         (apply + (cell-value :tenforty.forms.ty2016.w2g/federal_income_tax_withheld))
+                         (apply + (cell-value :tenforty.forms.ty2016.f1099r/federal_income_tax_withheld))
+                         (apply + (cell-value :tenforty.forms.ty2016.ssa1099/voluntary_federal_income_tax_withheld))
+                         (apply + (cell-value :tenforty.forms.ty2016.rrb1099/federal_income_tax_withheld))
+                         (cell-value :tenforty.forms.ty2016.f8959/total_additional_medicare_tax_withholding)))
    (make-number-input-line ::estimated_tax_payments)
    (make-number-input-line ::earned_income_credit)
    (make-number-input-line ::additional_child_tax_credit)
