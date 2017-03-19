@@ -33,22 +33,23 @@
   (lookup-group [self kw]
     [self]))
 
-(deftest form-line-smoke-test-2015
-  (let [situation (->SmokeTestTaxSituation tenforty.forms.ty2015/forms)
-        context (make-context tenforty.forms.ty2015/forms situation)
-        lines (vals (:lines tenforty.forms.ty2015/forms))]
-    (dorun (map (fn [line]
-                  (let [kw (:kw line)]
-                    (testing (str "Evaluate " kw " with zeros")
-                      (is (not (nil? (calculate context kw)))))))
-                lines))))
+(defn- build-contexts [group-kw parent-context base-situation]
+  (let [form-subgraph (:forms base-situation)
+        groups (:groups form-subgraph)
+        base-context (make-context form-subgraph base-situation group-kw parent-context)]
+    (apply merge (sorted-map group-kw base-context)
+           (map #(build-contexts % base-context (first (lookup-group base-situation %)))
+                (get groups group-kw)))))
 
 (deftest form-line-smoke-test-2016
-  (let [situation (->SmokeTestTaxSituation tenforty.forms.ty2016/forms)
-        context (make-context tenforty.forms.ty2016/forms situation)
-        lines (vals (:lines tenforty.forms.ty2016/forms))]
+  (let [forms tenforty.forms.ty2016/forms
+        situation (->SmokeTestTaxSituation forms)
+        lines (vals (:lines forms))
+        contexts (build-contexts nil nil situation)]
     (dorun (map (fn [line]
-                  (let [kw (:kw line)]
+                  (let [kw (:kw line)
+                        group (:group line)
+                        context (get contexts group)]
                     (testing (str "Evaluate " kw " with zeros")
                       (is (not (nil? (calculate context kw)))))))
                 lines))))
