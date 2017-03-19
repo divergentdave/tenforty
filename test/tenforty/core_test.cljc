@@ -176,7 +176,30 @@
                                                   {:z 3} {})
                                                  (->MapTaxSituation
                                                   {:z 4} {})]})]})]
-    (is (= 10 (calculate form :x situation)))))
+    (is (= 10 (calculate form :x situation))))
+  (let [form (make-form-subgraph
+              [nil #{:child}]
+              [(make-formula-line :x (apply + (cell-value :y)))
+               (make-number-input-line :multiplier)]
+              [:child #{:grandchild}]
+              [(make-formula-line :y (apply + (cell-value :z)))]
+              [:grandchild #{}]
+              [(make-number-input-line :w)
+               (make-formula-line :z (* (cell-value :w)
+                                        (cell-value :multiplier)))])
+        situation (->MapTaxSituation
+                   {:multiplier 2}
+                   {:child [(->MapTaxSituation
+                             {} {:grandchild [(->MapTaxSituation
+                                               {:w 1} {})
+                                              (->MapTaxSituation
+                                               {:w 2} {})]})
+                            (->MapTaxSituation
+                             {} {:grandchild [(->MapTaxSituation
+                                               {:w 3} {})
+                                              (->MapTaxSituation
+                                               {:w 4} {})]})]})]
+    (is (= 20 (calculate form :x situation)))))
 
 (deftest reverse-deps-test
   (let [form (make-form-subgraph
