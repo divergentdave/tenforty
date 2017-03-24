@@ -32,13 +32,16 @@
                       (* 0.009
                          (max (- (cell-value ::medicare_self_employment_income)
                                  (max (- (cell-value ::additional_medicare_tax_threshold)
-                                         (cell-value ::medicare_wages_tips)))))))
+                                         (cell-value ::medicare_wages_tips))
+                                      0))
+                              0)))
    (make-number-input-line ::rrta_compensation_and_tips) ; TODO
    (make-number-input-line ::rrta_additional_medicare_tax_withholding) ; TODO
    (make-formula-line ::additional_medicare_tax_on_rrta_compensation
                       (* 0.009
                          (max (- (cell-value ::rrta_compensation_and_tips)
-                                 (cell-value ::additional_medicare_tax_threshold)))))
+                                 (cell-value ::additional_medicare_tax_threshold))
+                              0)))
    (make-formula-line ::additional_medicare_tax
                       (+ (cell-value ::additional_medicare_tax_on_medicare_wages)
                          (cell-value ::additional_medicare_tax_on_self_employment_income)
