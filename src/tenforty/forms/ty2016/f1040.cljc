@@ -198,7 +198,7 @@
                               SINGLE 1550
                               HEAD_OF_HOUSEHOLD 1550)))
                         ; Exception 2 - box on line 39a checked
-                        (> (cell-value ::senior_blind_total) 0)
+                        (pos? (cell-value ::senior_blind_total))
                         (condp = (cell-value ::filing_status)
                           SINGLE (case (cell-value ::senior_blind_total)
                                    1 7850
