@@ -1,8 +1,12 @@
 language: clojure
 lein: 2.7.1
-install: lein with-profile +dev deps
+install:
+  - (cd; git clone https://github.com/divergentdave/eastwood.git; cd eastwood; git checkout for-tenforty; lein install)
+  - echo '{:user {:plugins [[jonase/eastwood "0.2.4-SNAPSHOT"]]}}' > ~/.lein/profiles.clj
+  - lein with-profile +dev deps
 script:
   - lein with-profile +dev cljfmt check
+  - lein eastwood
   - lein test
   - lein cljsbuild once dev
   - lein cljsbuild once test
