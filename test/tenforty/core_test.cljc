@@ -23,7 +23,7 @@
 
 (deftest data-deps
   (testing "Get data dependencies from a quoted form"
-    (is (= #{:AGI}) (data-dependencies '(cell-value :AGI)))
+    (is (= #{:AGI} (data-dependencies '(cell-value :AGI))))
     (is (= #{} (data-dependencies '(+ 1 1))))
     (is (= #{} (data-dependencies '(identity 0))))
     (is (= #{:AGI} (data-dependencies '(+ (cell-value :AGI) 1))))
@@ -43,7 +43,7 @@
   (testing "Macro to create a line with an expression"
     (let [tax_minus_credits
           (make-formula-line :tenforty.forms.ty2015.f1040/tax_minus_credits (max (- (cell-value :tenforty.forms.ty2015.f1040/pretotal_tax) (cell-value :tenforty.forms.ty2015.f1040/total_credits) (cell-value :tenforty.forms.ty2015.s8812/ctc)) 0))]
-      (is (= :tenforty.forms.ty2015.f1040/tax_minus_credits) (:kw tax_minus_credits))
+      (is (= :tenforty.forms.ty2015.f1040/tax_minus_credits (:kw tax_minus_credits)))
       (is (fn? (:fn tax_minus_credits)))
       (is (= #{:tenforty.forms.ty2015.f1040/pretotal_tax :tenforty.forms.ty2015.f1040/total_credits :tenforty.forms.ty2015.s8812/ctc} (:deps tax_minus_credits)))
       (is (== 0 ((:fn tax_minus_credits) (fn [kw] 0))))
