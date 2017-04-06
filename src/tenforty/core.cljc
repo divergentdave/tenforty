@@ -174,9 +174,8 @@
   (let [parent-context (:parent-context context)]
     (if (= group-kw (:group context))
       context
-      (if parent-context
-        (find-group-parent-contexts group-kw parent-context)
-        nil))))
+      (when parent-context
+        (find-group-parent-contexts group-kw parent-context)))))
 
 (defn- throw-portable
   [message]
