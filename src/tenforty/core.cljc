@@ -112,15 +112,19 @@
   (let [l (gensym "l")
         map_acc (gensym "map_acc")
         part (gensym "part")
-        coll (gensym "coll")
         obj (gensym "obj")
+        keys-seen (gensym "keys-seen")
+        i (gensym "i")
         lines (gensym "lines")
         groups (gensym "groups")]
     `(let [~l (list ~@args)]
-       (reduce (fn [~coll ~obj] (if (contains? ~coll (:kw ~obj))
-                                  (throw (IllegalArgumentException. (str "More than one line uses the keyword " (:kw ~obj))))
-                                  (conj ~coll (:kw ~obj))))
-               #{} (apply concat (map second (partition 2 ~l))))
+       (let [~lines (apply concat (map second (partition 2 ~l)))]
+         (loop [~keys-seen #{} ~i 0]
+           (when (< ~i (count ~lines))
+             (let [~obj (nth ~lines ~i)]
+               (if (contains? ~keys-seen (:kw ~obj))
+                 (throw (IllegalArgumentException. (str "More than one line uses the keyword " (:kw ~obj))))
+                 (recur (conj ~keys-seen (:kw ~obj)) (inc ~i)))))))
 
        (let [~lines (reduce (fn [~map_acc ~part]
                               (merge
